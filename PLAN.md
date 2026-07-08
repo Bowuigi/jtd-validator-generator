@@ -317,19 +317,19 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 
 **TODO:**
 
-- [ ] Valid v1: `{ "version": "v1", "a": 1.5 }` accepted
-- [ ] Valid v2: `{ "version": "v2", "a": "hello" }` accepted
-- [ ] Tag exemption: `"version"` is NOT checked as additional property by the mapping's properties schema
-- [ ] Not an object: `null` → `"expected object"`, `path: []`
-- [ ] Not an object: `"string"` → `"expected object"`, `path: []`
-- [ ] Missing discriminator tag: `{}` → `"missing discriminator \"version\""`, suggestions `["v1", "v2"]`, `path: []`
-- [ ] Tag not a string: `{ "version": 1 }` → `"discriminator must be a string"`, suggestions `[]`, `path: ["version"]`
-- [ ] Unknown discriminator value: `{ "version": "v3" }` → `"unknown discriminator value \"v3\""`, suggestions `["v1", "v2"]`, `path: ["version"]`
-- [ ] Property type mismatch in mapping: `{ "version": "v2", "a": 3 }` → error at `path: ["a"]`, `"expected string, got number"`
-- [ ] Extra property on mapping variant: `{ "version": "v1", "a": 1.5, "extra": "x" }` → `"unexpected property \"extra\""`, `path: ["extra"]`
-- [ ] With `nullable: true`: `null` accepted
-- [ ] More complex mapping with optionalProperties — from RFC §2.2.8 example
-- [ ] All mapping variants accepted
+- [x] Valid v1: `{ "version": "v1", "a": 1.5 }` accepted
+- [x] Valid v2: `{ "version": "v2", "a": "hello" }` accepted
+- [x] Tag exemption: `"version"` is NOT checked as additional property by the mapping's properties schema
+- [x] Not an object: `null` → `"expected object"`, `path: []`
+- [x] Not an object: `"string"` → `"expected object"`, `path: []`
+- [x] Missing discriminator tag: `{}` → `"missing discriminator \"version\""`, suggestions `["v1", "v2"]`, `path: []`
+- [x] Tag not a string: `{ "version": 1 }` → `"discriminator must be a string"`, suggestions `[]`, `path: ["version"]`
+- [x] Unknown discriminator value: `{ "version": "v3" }` → `"unknown discriminator value \"v3\""`, suggestions `["v1", "v2"]`, `path: ["version"]`
+- [x] Property type mismatch in mapping: `{ "version": "v2", "a": 3 }` → error at `path: ["a"]`, `"expected string, got number"`
+- [x] Extra property on mapping variant: `{ "version": "v1", "a": 1.5, "extra": "x" }` → `"unexpected property \"extra\""`, `path: ["extra"]`
+- [x] With `nullable: true`: `null` accepted
+- [x] More complex mapping with optionalProperties — from RFC §2.2.8 example
+- [x] All mapping variants accepted
 
 ---
 
