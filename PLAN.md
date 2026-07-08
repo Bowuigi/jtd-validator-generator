@@ -93,15 +93,15 @@ tests/
 
 **TODO:**
 
-- [ ] `{}` accepts `null`
-- [ ] `{}` accepts `true`
-- [ ] `{}` accepts `false`
-- [ ] `{}` accepts `123`
-- [ ] `{}` accepts `"string"`
-- [ ] `{}` accepts `[]`
-- [ ] `{}` accepts `{}`
-- [ ] `{ "nullable": true }` accepts `null`
-- [ ] `{ "metadata": { "foo": "bar" } }` accepts any value (e.g., `42`)
+- [x] `{}` accepts `null`
+- [x] `{}` accepts `true`
+- [x] `{}` accepts `false`
+- [x] `{}` accepts `123`
+- [x] `{}` accepts `"string"`
+- [x] `{}` accepts `[]`
+- [x] `{}` accepts `{}`
+- [x] `{ "nullable": true }` accepts `null`
+- [x] `{ "metadata": { "foo": "bar" } }` accepts any value (e.g., `42`)
 
 ---
 
