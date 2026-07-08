@@ -209,20 +209,20 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 
 **TODO — Required properties:**
 
-- [ ] All required properties present → accepted
-- [ ] Missing required property → `"missing required property \"<name>\""`, `path: []`, suggestions `[]`
-- [ ] Multiple missing required properties → one error per missing property
-- [ ] Required property type mismatch → error at `path: ["<prop>"]`
+- [x] All required properties present → accepted
+- [x] Missing required property → `"missing required property \"<name>\""`, `path: []`, suggestions `[]`
+- [x] Multiple missing required properties → one error per missing property
+- [x] Required property type mismatch → error at `path: ["<prop>"]`
 
 **TODO — Optional properties:**
 
-- [ ] All optional properties absent → accepted
-- [ ] Optional property present with valid value → accepted
-- [ ] Optional property type mismatch → error at `path: ["<prop>"]`
+- [x] All optional properties absent → accepted
+- [x] Optional property present with valid value → accepted
+- [x] Optional property type mismatch → error at `path: ["<prop>"]`
 
 **TODO — Mixed required + optional:**
 
-- [ ] RFC example: `{ "properties": { "a": { "type": "string" }, "b": { "type": "string" } }, "optionalProperties": { "c": { "type": "string" }, "d": { "type": "string" } } }`
+- [x] RFC example: `{ "properties": { "a": { "type": "string" }, "b": { "type": "string" } }, "optionalProperties": { "c": { "type": "string" }, "d": { "type": "string" } } }`
   - `{ "a": "x", "b": "y" }` accepted
   - `{ "a": "x", "b": "y", "c": "z" }` accepted
   - `{ "a": "x", "b": "y", "c": "z", "d": "w" }` accepted
@@ -230,36 +230,36 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 
 **TODO — Additional properties:**
 
-- [ ] Unknown property rejected (default): `{ "e": 3 }` → `"unexpected property \"e\""`, suggestions `["a", "b", "c", "d"]`, `path: ["e"]`
-- [ ] `additionalProperties: true` — unknown property accepted
-- [ ] `additionalProperties: true` still validates known properties' values
-- [ ] Multiple unknown properties → one error per unknown property
+- [x] Unknown property rejected (default): `{ "e": 3 }` → `"unexpected property \"e\""`, suggestions `["a", "b", "c", "d"]`, `path: ["e"]`
+- [x] `additionalProperties: true` — unknown property accepted
+- [x] `additionalProperties: true` still validates known properties' values
+- [x] Multiple unknown properties → one error per unknown property
 
 **TODO — Not an object:**
 
-- [ ] `null` → `"expected object"`, `path: []`
-- [ ] `"string"` → `"expected object"`, `path: []`
-- [ ] `123` → `"expected object"`, `path: []`
+- [x] `null` → `"expected object"`, `path: []`
+- [x] `"string"` → `"expected object"`, `path: []`
+- [x] `123` → `"expected object"`, `path: []`
 
 **TODO — Multiple simultaneous errors (RFC §3.3.6 example):**
 
-- [ ] `{ "b": 3, "c": 3, "e": 3 }` against the RFC schema produces 4 errors:
+- [x] `{ "b": 3, "c": 3, "e": 3 }` against the RFC schema produces 4 errors:
   - `path: []`, `"missing required property \"a\""`, suggestions `[]`
   - `path: ["b"]`, `"expected string, got number"` (from `/properties/b/type`)
   - `path: ["c"]`, `"expected string, got number"` (from `/optionalProperties/c/type`)
   - `path: ["e"]`, `"unexpected property \"e\""`, suggestions `["a", "b", "c", "d"]`
-- [ ] Same but with `additionalProperties: true` → only 3 errors (no "unexpected property" for `e`)
+- [x] Same but with `additionalProperties: true` → only 3 errors (no "unexpected property" for `e`)
 
 **TODO — Nullable:**
 
-- [ ] `{ "nullable": true, ... }` accepts `null`
-- [ ] `{ "nullable": true, ... }` still validates non-null objects
+- [x] `{ "nullable": true, ... }` accepts `null`
+- [x] `{ "nullable": true, ... }` still validates non-null objects
 
 **TODO — Edge cases:**
 
-- [ ] Only `optionalProperties` (no `properties`) — valid
-- [ ] Only `properties` (no `optionalProperties`) — valid
-- [ ] Empty properties object `"properties": {}` — no required properties
+- [x] Only `optionalProperties` (no `properties`) — valid
+- [x] Only `properties` (no `optionalProperties`) — valid
+- [x] Empty properties object `"properties": {}` — no required properties
 
 ---
 
