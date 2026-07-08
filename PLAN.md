@@ -191,15 +191,15 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 
 **TODO:**
 
-- [ ] Empty array `[]` accepted
-- [ ] All-valid array `[1, 2, 3]` accepted for `{ "elements": { "type": "float32" } }`
-- [ ] Non-array rejected: `null` → `"expected array"`, `path: []`
-- [ ] Non-array rejected: `{}` → `"expected array"`, `path: []`
-- [ ] Non-array rejected: `"foo"` → `"expected array"`, `path: []`
-- [ ] Single element type mismatch: `[1, "foo"]` → error at `path: [1]`, `"expected float32, got string"`
-- [ ] Multiple element type mismatches: `[1, "a", "b", 2]` → errors at `[1]` and `[2]`
-- [ ] With `nullable: true`: `null` accepted
-- [ ] With `nullable: true`: valid arrays still work, invalid elements still rejected
+- [x] Empty array `[]` accepted
+- [x] All-valid array `[1, 2, 3]` accepted for `{ "elements": { "type": "float32" } }`
+- [x] Non-array rejected: `null` → `"expected array"`, `path: []`
+- [x] Non-array rejected: `{}` → `"expected array"`, `path: []`
+- [x] Non-array rejected: `"foo"` → `"expected array"`, `path: []`
+- [x] Single element type mismatch: `[1, "foo"]` → error at `path: [1]`, `"expected float32, got string"`
+- [x] Multiple element type mismatches: `[1, "a", "b", 2]` → errors at `[1]` and `[2]`
+- [x] With `nullable: true`: `null` accepted
+- [x] With `nullable: true`: valid arrays still work, invalid elements still rejected
 
 ---
 
