@@ -179,3 +179,116 @@ Deno.test("properties array rejected (not object)", async () => {
     { path: [], message: "expected object" },
   ]);
 });
+
+const NESTED_PROPS_SCHEMA = {
+  properties: {
+    user: {
+      properties: { id: { type: "string" }, name: { type: "string" } },
+      optionalProperties: { email: { type: "string" } },
+    },
+  },
+};
+
+Deno.test("properties nested properties form accepted", async () => {
+  await assertAccepted(NESTED_PROPS_SCHEMA, { user: { id: "1", name: "Alice" } });
+  await assertAccepted(NESTED_PROPS_SCHEMA, { user: { id: "1", name: "Alice", email: "a@b.com" } });
+});
+
+Deno.test("properties nested properties missing deep required", async () => {
+  await assertRejected(NESTED_PROPS_SCHEMA, { user: { id: "1" } }, [
+    { path: ["user"], message: 'missing required property "name"', suggestions: [] },
+  ]);
+});
+
+Deno.test("properties nested properties type mismatch at depth", async () => {
+  await assertRejected(NESTED_PROPS_SCHEMA, { user: { id: "1", name: 3 } }, [
+    { path: ["user", "name"], message: "expected string, got number" },
+  ]);
+});
+
+Deno.test("properties nested properties missing top-level required", async () => {
+  await assertRejected(NESTED_PROPS_SCHEMA, {}, [
+    { path: [], message: 'missing required property "user"', suggestions: [] },
+  ]);
+});
+
+const NESTED_ELEMS_SCHEMA = {
+  properties: {
+    tags: { elements: { type: "string" } },
+  },
+};
+
+Deno.test("properties nested elements accepted", async () => {
+  await assertAccepted(NESTED_ELEMS_SCHEMA, { tags: [] });
+  await assertAccepted(NESTED_ELEMS_SCHEMA, { tags: ["a", "b"] });
+});
+
+Deno.test("properties nested elements type mismatch at index", async () => {
+  await assertRejected(NESTED_ELEMS_SCHEMA, { tags: [1] }, [
+    { path: ["tags", 0], message: "expected string, got number" },
+  ]);
+});
+
+Deno.test("properties nested elements not an array", async () => {
+  await assertRejected(NESTED_ELEMS_SCHEMA, { tags: "foo" }, [
+    { path: ["tags"], message: "expected array" },
+  ]);
+});
+
+const MIXED_SCHEMA = {
+  properties: {
+    items: {
+      elements: {
+        properties: { id: { type: "float32" }, label: { type: "string" } },
+      },
+    },
+  },
+};
+
+Deno.test("properties mixed elements containing properties accepted", async () => {
+  await assertAccepted(MIXED_SCHEMA, { items: [] });
+  await assertAccepted(
+    MIXED_SCHEMA,
+    { items: [{ id: 1, label: "foo" }, { id: 2, label: "bar" }] },
+  );
+});
+
+Deno.test("properties mixed type mismatch at element property", async () => {
+  await assertRejected(
+    MIXED_SCHEMA,
+    { items: [{ id: "bad", label: "foo" }] },
+    [
+      { path: ["items", 0, "id"], message: "expected float32, got string" },
+    ],
+  );
+});
+
+Deno.test("properties mixed missing required at element property", async () => {
+  await assertRejected(
+    MIXED_SCHEMA,
+    { items: [{ id: 1 }] },
+    [
+      { path: ["items", 0], message: 'missing required property "label"', suggestions: [] },
+    ],
+  );
+});
+
+const DEEP_SCHEMA = {
+  properties: {
+    data: {
+      elements: {
+        properties: { x: { type: "float32" } },
+      },
+    },
+  },
+};
+
+Deno.test("properties deep triple nesting accepted", async () => {
+  await assertAccepted(DEEP_SCHEMA, { data: [{ x: 1 }, { x: 2 }] });
+});
+
+Deno.test("properties deep triple nesting error at depth", async () => {
+  await assertRejected(DEEP_SCHEMA, { data: [{ x: "bad" }] }, [
+    { path: ["data", 0, "x"], message: "expected float32, got string" },
+  ]);
+});

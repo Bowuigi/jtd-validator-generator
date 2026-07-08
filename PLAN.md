@@ -261,6 +261,12 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 - [x] Only `properties` (no `optionalProperties`) — valid
 - [x] Empty properties object `"properties": {}` — no required properties
 
+**TODO — Nested properties:**
+
+- [x] Nested properties form: property value is an object with its own properties/optionalProperties
+- [x] Nested elements form: property value is an array
+- [x] Mixed nesting: elements containing properties, errors at depth
+
 ---
 
 ## Task 6 — `tests/values.test.ts`
