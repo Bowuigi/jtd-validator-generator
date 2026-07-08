@@ -356,9 +356,9 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 }
 ```
 
-- [ ] Value `1.5` accepted
-- [ ] Value `"foo"` rejected → `"expected float32, got string"`, `path: []`
-- [ ] `null` rejected → `"expected float32, got null"`, `path: []`
+- [x] Value `1.5` accepted
+- [x] Value `"foo"` rejected → `"expected float32, got string"`, `path: []`
+- [x] `null` rejected → `"expected float32, got null"`, `path: []`
 
 **TODO — Nullable ref:**
 
@@ -370,9 +370,9 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 }
 ```
 
-- [ ] `null` accepted
-- [ ] `1.5` still accepted
-- [ ] `"foo"` still rejected
+- [x] `null` accepted
+- [x] `1.5` still accepted
+- [x] `"foo"` still rejected
 
 **TODO — Ref to properties:**
 
@@ -390,8 +390,8 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 }
 ```
 
-- [ ] `{ "lat": 1.0, "lng": 2.0 }` accepted
-- [ ] `{ "lat": "foo" }` → `"missing required property \"lng\""` at `path: []` AND type error at `path: ["lat"]`
+- [x] `{ "lat": 1.0, "lng": 2.0 }` accepted
+- [x] `{ "lat": "foo" }` → `"missing required property \"lng\""` at `path: []` AND type error at `path: ["lat"]`
 
 **TODO — Ref in elements:**
 
@@ -402,8 +402,8 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 }
 ```
 
-- [ ] `[1, 2, 3]` accepted
-- [ ] `[1, "foo"]` → error at `path: [1]`
+- [x] `[1, 2, 3]` accepted
+- [x] `[1, "foo"]` → error at `path: [1]`
 
 **TODO — Ref in properties:**
 
@@ -417,7 +417,7 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 }
 ```
 
-- [ ] `{ "x": 1.0, "y": 2.0 }` accepted
+- [x] `{ "x": 1.0, "y": 2.0 }` accepted
 
 **TODO — Recursive schema (linked list):**
 
@@ -435,10 +435,10 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 }
 ```
 
-- [ ] `{ "value": 1, "next": null }` accepted
-- [ ] `{ "value": 1, "next": { "value": 2, "next": null } }` accepted
-- [ ] `{ "value": 1, "next": { "value": 2, "next": { "value": 3, "next": null } } }` accepted
-- [ ] Invalid at depth: `{ "value": 1, "next": { "value": "bad" } }` → error at `path: ["next"]` for missing `"value"` property and type mismatch on `"bad"`
+- [x] `{ "value": 1, "next": null }` accepted
+- [x] `{ "value": 1, "next": { "value": 2, "next": null } }` accepted
+- [x] `{ "value": 1, "next": { "value": 2, "next": { "value": 3, "next": null } } }` accepted
+- [x] Invalid at depth: `{ "value": 1, "next": { "value": "bad" } }` → error at `path: ["next","value"]` for type mismatch on `"bad"` and missing `"next"` on path `["next"]`
 
 **TODO — Recursive schema (JSON tree):**
 
@@ -459,8 +459,8 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 }
 ```
 
-- [ ] Valid tree accepted
-- [ ] Invalid at depth rejected
+- [x] Valid tree accepted
+- [x] Invalid at depth rejected
 
 ---
 
