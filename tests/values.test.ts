@@ -85,3 +85,96 @@ Deno.test("values nullable: true invalid values still rejected", async () => {
     ],
   );
 });
+
+// Nested values
+
+const NESTED_VALUES_SCHEMA = { values: { values: { type: "float32" } } };
+
+Deno.test("values nested values accepted", async () => {
+  await assertAccepted(NESTED_VALUES_SCHEMA, { a: { x: 1 }, b: { y: 2 } });
+});
+
+Deno.test("values nested values type mismatch at depth", async () => {
+  await assertRejected(NESTED_VALUES_SCHEMA, { a: { x: "foo" } }, [
+    { path: ["a", "x"], message: "expected float32, got string" },
+  ]);
+});
+
+// Values containing properties
+
+const VALUES_CONTAINING_PROPS = {
+  values: {
+    properties: { id: { type: "float32" }, name: { type: "string" } },
+  },
+};
+
+Deno.test("values containing properties accepted", async () => {
+  await assertAccepted(
+    VALUES_CONTAINING_PROPS,
+    { a: { id: 1, name: "foo" }, b: { id: 2, name: "bar" } },
+  );
+});
+
+Deno.test("values containing properties missing required and type mismatch", async () => {
+  await assertRejected(VALUES_CONTAINING_PROPS, { a: { id: "bad" } }, [
+    { path: ["a"], message: 'missing required property "name"', suggestions: [] },
+    { path: ["a", "id"], message: "expected float32, got string" },
+  ]);
+});
+
+// Values containing elements
+
+const VALUES_CONTAINING_ELEMS = { values: { elements: { type: "string" } } };
+
+Deno.test("values containing elements accepted", async () => {
+  await assertAccepted(
+    VALUES_CONTAINING_ELEMS,
+    { a: ["x", "y"], b: [] },
+  );
+});
+
+Deno.test("values containing elements type mismatch at index", async () => {
+  await assertRejected(VALUES_CONTAINING_ELEMS, { a: ["x", 1] }, [
+    { path: ["a", 1], message: "expected string, got number" },
+  ]);
+});
+
+// Properties containing values
+
+const PROPS_CONTAINING_VALUES = {
+  properties: {
+    data: { values: { type: "float32" } },
+  },
+};
+
+Deno.test("properties containing values accepted", async () => {
+  await assertAccepted(
+    PROPS_CONTAINING_VALUES,
+    { data: { x: 1, y: 2 } },
+  );
+});
+
+Deno.test("properties containing values type mismatch", async () => {
+  await assertRejected(PROPS_CONTAINING_VALUES, { data: { x: "bad" } }, [
+    { path: ["data", "x"], message: "expected float32, got string" },
+  ]);
+});
+
+// Elements containing values
+
+const ELEMS_CONTAINING_VALUES = {
+  elements: { values: { type: "float32" } },
+};
+
+Deno.test("elements containing values accepted", async () => {
+  await assertAccepted(
+    ELEMS_CONTAINING_VALUES,
+    [{ a: 1, b: 2 }],
+  );
+});
+
+Deno.test("elements containing values type mismatch at element value", async () => {
+  await assertRejected(ELEMS_CONTAINING_VALUES, [{ a: "bad" }], [
+    { path: [0, "a"], message: "expected float32, got string" },
+  ]);
+});

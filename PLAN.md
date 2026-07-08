@@ -284,6 +284,19 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 - [x] With `nullable: true`: `null` accepted
 - [x] With `nullable: true`: valid objects still work, invalid values still rejected
 
+**TODO — Nested values:**
+
+- [x] Nested values: `{ "values": { "values": { "type": "float32" } } }` accepts `{ "a": { "x": 1 }, "b": { "y": 2 } }`
+- [x] Nested values: type mismatch at depth `{ "a": { "x": "foo" } }` → error at `path: ["a", "x"]`
+- [x] Values containing properties: `{ "values": { "properties": { "id": { "type": "float32" }, "name": { "type": "string" } } } }` accepts valid objects
+- [x] Values containing properties: missing required and type mismatch at depth
+- [x] Values containing elements: `{ "values": { "elements": { "type": "string" } } }` accepts arrays of strings
+- [x] Values containing elements: type mismatch at array index under value key → `path: ["a", 1]`
+- [x] Properties containing values: `{ "properties": { "data": { "values": { "type": "float32" } } } }` accepted
+- [x] Properties containing values: type mismatch at `path: ["data", "x"]`
+- [x] Elements containing values: `{ "elements": { "values": { "type": "float32" } } }` accepted
+- [x] Elements containing values: type mismatch at `path: [0, "a"]`
+
 ---
 
 ## Task 7 — `tests/discriminator.test.ts`
