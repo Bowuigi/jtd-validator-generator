@@ -275,14 +275,14 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 
 **TODO:**
 
-- [ ] Empty object `{}` accepted
-- [ ] All values valid: `{ "a": 1, "b": 2 }` accepted for `{ "values": { "type": "float32" } }`
-- [ ] Not an object: `null` → `"expected object"`, `path: []`
-- [ ] Not an object: `"foo"` → `"expected object"`, `path: []`
-- [ ] Single value type mismatch: `{ "a": 1, "b": "foo" }` → error at `path: ["b"]`
-- [ ] Multiple value type mismatches: `{ "a": 1, "b": "foo", "c": "bar" }` → errors at `["b"]`, `["c"]`
-- [ ] With `nullable: true`: `null` accepted
-- [ ] With `nullable: true`: valid objects still work, invalid values still rejected
+- [x] Empty object `{}` accepted
+- [x] All values valid: `{ "a": 1, "b": 2 }` accepted for `{ "values": { "type": "float32" } }`
+- [x] Not an object: `null` → `"expected object"`, `path: []`
+- [x] Not an object: `"foo"` → `"expected object"`, `path: []`
+- [x] Single value type mismatch: `{ "a": 1, "b": "foo" }` → error at `path: ["b"]`
+- [x] Multiple value type mismatches: `{ "a": 1, "b": "foo", "c": "bar" }` → errors at `["b"]`, `["c"]`
+- [x] With `nullable: true`: `null` accepted
+- [x] With `nullable: true`: valid objects still work, invalid values still rejected
 
 ---
 
