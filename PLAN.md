@@ -470,16 +470,16 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 
 **TODO:**
 
-- [ ] Empty form: `{ "nullable": true }` accepts `null`
-- [ ] Type form: `{ "type": "string", "nullable": true }` accepts `null`
-- [ ] Enum form: `{ "enum": ["A"], "nullable": true }` accepts `null`
-- [ ] Elements form: `{ "elements": { "type": "string" }, "nullable": true }` accepts `null`
-- [ ] Properties form: `{ "properties": { "a": { "type": "string" } }, "nullable": true }` accepts `null`
-- [ ] Values form: `{ "values": { "type": "string" }, "nullable": true }` accepts `null`
-- [ ] Discriminator form: `{ "discriminator": "x", "mapping": { "a": { "properties": { "b": { "type": "string" } } } }, "nullable": true }` accepts `null`
-- [ ] `nullable: false` has no effect on any form (null still rejected with form-appropriate message)
-- [ ] `nullable` omitted means no null accepted (same as `nullable: false`)
-- [ ] `nullable: true` does not leak to child schemas — child schemas without `nullable: true` still reject `null`
+- [x] Empty form: `{ "nullable": true }` accepts `null`
+- [x] Type form: `{ "type": "string", "nullable": true }` accepts `null`
+- [x] Enum form: `{ "enum": ["A"], "nullable": true }` accepts `null`
+- [x] Elements form: `{ "elements": { "type": "string" }, "nullable": true }` accepts `null`
+- [x] Properties form: `{ "properties": { "a": { "type": "string" } }, "nullable": true }` accepts `null`
+- [x] Values form: `{ "values": { "type": "string" }, "nullable": true }` accepts `null`
+- [x] Discriminator form: `{ "discriminator": "x", "mapping": { "a": { "properties": { "b": { "type": "string" } } } }, "nullable": true }` accepts `null`
+- [x] `nullable: false` has no effect on any form (null still rejected with form-appropriate message)
+- [x] `nullable` omitted means no null accepted (same as `nullable: false`)
+- [x] `nullable: true` does not leak to child schemas — child schemas without `nullable: true` still reject `null`
 
 ---
 
