@@ -1,7 +1,7 @@
 import { generateCode } from '../mod.ts';
 
 // Note that the test's output type is meant to be the following:
-type ValidationResult =
+export type ValidationResult =
   | { success: true }
   | { success: false, errors: Array<{ path: Array<string | number>, message: string, suggestions: Array<string> }> };
 

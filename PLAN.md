@@ -72,7 +72,6 @@ type ValidationResult =
 
 ```
 tests/
-├── helpers.ts            # Shared test utilities
 ├── empty.test.ts         # Empty form
 ├── type.test.ts          # Type form (all 11 types)
 ├── enum.test.ts          # Enum form
@@ -86,28 +85,7 @@ tests/
 
 ---
 
-## Task 1 — `tests/helpers.ts`
-
-**TODO:**
-
-- [ ] Define `ValidationResult` type (export from setup.ts or re-export it)
-- [ ] Re-export `testValidatorGeneration` from `./setup.ts`
-- [ ] Implement `assertValid(schema, data)`:
-  - Calls `testValidatorGeneration(schema, data)`
-  - Asserts `result.success === true`
-  - If `result.success === false`, format a clear failure showing the unexpected errors
-- [ ] Implement `assertErrors(schema, data, expectedErrors)` (use test steps for this):
-  - Each expected error: `{ path: Array<string|number>, message: string, suggestions: Array<string> }`
-  - Calls `testValidatorGeneration(schema, data)`
-  - Asserts `result.success === false`
-  - Asserts `result.errors.length === expectedErrors.length` (with descriptive failure)
-  - For each expected error, assert `path`, `message`, and `suggestions` match
-  - Assert that there are no extra errors (order-independent comparison)
-  - Use `assertEquals` from `@std/assert`
-
----
-
-## Task 2 — `tests/empty.test.ts`
+## Task 1 — `tests/empty.test.ts`
 
 **Overview:** The empty form (`{}` or `{ "nullable": true }` or `{ "metadata": {...} }`) accepts **all** JSON instances. No errors are ever produced.
 
@@ -125,7 +103,7 @@ tests/
 
 ---
 
-## Task 3 — `tests/type.test.ts`
+## Task 2 — `tests/type.test.ts`
 
 **Overview:** The type form (`{ "type": "<jtdType>" }`) validates that an instance matches a specific JSON type with optional range constraints.
 
@@ -190,7 +168,7 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 
 ---
 
-## Task 4 — `tests/enum.test.ts`
+## Task 3 — `tests/enum.test.ts`
 
 **Overview:** The enum form (`{ "enum": ["A", "B"] }`) validates that a value is one of the listed strings.
 
@@ -205,7 +183,7 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 
 ---
 
-## Task 5 — `tests/elements.test.ts`
+## Task 4 — `tests/elements.test.ts`
 
 **Overview:** The elements form (`{ "elements": { ... } }`) validates that an instance is an array and each element satisfies the subschema.
 
@@ -223,7 +201,7 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 
 ---
 
-## Task 6 — `tests/properties.test.ts`
+## Task 5 — `tests/properties.test.ts`
 
 **Overview:** The properties form (`{ "properties": { ... }, "optionalProperties": { ... } }`) validates JSON objects as structs — required/optional fields, additional properties control.
 
@@ -283,7 +261,7 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 
 ---
 
-## Task 7 — `tests/values.test.ts`
+## Task 6 — `tests/values.test.ts`
 
 **Overview:** The values form (`{ "values": { ... } }`) validates that an instance is an object where all member values satisfy the subschema.
 
@@ -300,7 +278,7 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 
 ---
 
-## Task 8 — `tests/discriminator.test.ts`
+## Task 7 — `tests/discriminator.test.ts`
 
 **Overview:** The discriminator form (`{ "discriminator": "<prop>", "mapping": { ... } }`) validates tagged unions — objects with a discriminator property whose string value selects a schema variant.
 
@@ -334,7 +312,7 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 
 ---
 
-## Task 9 — `tests/ref.test.ts`
+## Task 8 — `tests/ref.test.ts`
 
 **Overview:** The ref form (`{ "ref": "<name>" }`) delegates validation to a named definition from the root `"definitions"` object. Supports recursive structures.
 
@@ -455,7 +433,7 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 
 ---
 
-## Task 10 — `tests/nullable.test.ts`
+## Task 9 — `tests/nullable.test.ts`
 
 **Overview:** Tests that `nullable: true` consistently accepts `null` across all forms, and has no effect when `false` or omitted.
 
