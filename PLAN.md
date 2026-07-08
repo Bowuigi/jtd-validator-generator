@@ -16,6 +16,8 @@ The tests are written **first** (TDD-style) and will fail initially. Once the te
 
 `tests/setup.ts` provides `testValidatorGeneration(schema, data)`. You MUST call this function either on the tests themselves or in some helper called from them, because it gives you validator generation (based on `schema`) results when ran using `data` as the data to validate.
 
+Use Deno's testing facilities. `assertEquals` from `@std/assert` and `Deno.test(...)`.
+
 ### ValidationResult type (what `testValidatorGeneration` returns)
 
 ```ts
