@@ -113,33 +113,33 @@ tests/
 
 **TODO — boolean tests:**
 
-- [ ] `true` accepted
-- [ ] `false` accepted
-- [ ] `"true"` rejected — `"expected boolean, got string"`, `path: []`
-- [ ] `123` rejected — `"expected boolean, got number"`, `path: []`
-- [ ] `null` rejected — `"expected boolean, got null"`, `path: []`
+- [x] `true` accepted
+- [x] `false` accepted
+- [x] `"true"` rejected — `"expected boolean, got string"`, `path: []`
+- [x] `123` rejected — `"expected boolean, got number"`, `path: []`
+- [x] `null` rejected — `"expected boolean, got null"`, `path: []`
 
 **TODO — float32/float64 tests:**
 
-- [ ] `0` accepted
-- [ ] `-3.14` accepted
-- [ ] `1e10` accepted
-- [ ] `"abc"` rejected — `"expected float32, got string"`, `path: []`
-- [ ] `null` rejected — `"expected float32, got null"`, `path: []`
-- [ ] Same tests for `float64` (identical validation behavior)
+- [x] `0` accepted
+- [x] `-3.14` accepted
+- [x] `1e10` accepted
+- [x] `"abc"` rejected — `"expected float32, got string"`, `path: []`
+- [x] `null` rejected — `"expected float32, got null"`, `path: []`
+- [x] Same tests for `float64` (identical validation behavior)
 
 **TODO — integer type tests (int8, uint8, int16, uint16, int32, uint32):**
 
 Each integer type needs:
 
-- [ ] **In-range value accepted** — e.g., `{ "type": "int8" }` accepts `0`, `-128`, `127`
-- [ ] **In-range with `.0` accepted** — `127.0`, `-128.0`
-- [ ] **In-range with scientific notation producing integer** — `1.0e1` accepted
-- [ ] **Above max rejected** — `{ "type": "int8" }` rejects `128` with `"value 128 out of range for int8"`, `path: []`
-- [ ] **Below min rejected** — `{ "type": "uint8" }` rejects `-1` with `"value -1 out of range for uint8"`, `path: []`
-- [ ] **Fractional rejected** — `{ "type": "int8" }` rejects `10.5` with `"expected integer for int8, got 10.5"`, `path: []`
-- [ ] **Wrong JSON type rejected** — `{ "type": "int8" }` rejects `"abc"` with `"expected int8, got string"`, `path: []`
-- [ ] **null rejected** — `"expected int8, got null"`, `path: []`
+- [x] **In-range value accepted** — e.g., `{ "type": "int8" }` accepts `0`, `-128`, `127`
+- [x] **In-range with `.0` accepted** — `127.0`, `-128.0`
+- [x] **In-range with scientific notation producing integer** — `1.0e1` accepted
+- [x] **Above max rejected** — `{ "type": "int8" }` rejects `128` with `"value 128 out of range for int8"`, `path: []`
+- [x] **Below min rejected** — `{ "type": "uint8" }` rejects `-1` with `"value -1 out of range for uint8"`, `path: []`
+- [x] **Fractional rejected** — `{ "type": "int8" }` rejects `10.5` with `"expected integer for int8, got 10.5"`, `path: []`
+- [x] **Wrong JSON type rejected** — `{ "type": "int8" }` rejects `"abc"` with `"expected int8, got string"`, `path: []`
+- [x] **null rejected** — `"expected int8, got null"`, `path: []`
 
 Range boundaries:
 - `int8`: -128 to 127
@@ -153,20 +153,20 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 
 **TODO — string tests:**
 
-- [ ] `"hello"` accepted
-- [ ] `""` (empty string) accepted
-- [ ] `123` rejected — `"expected string, got number"`, `path: []`
-- [ ] `null` rejected — `"expected string, got null"`, `path: []`
+- [x] `"hello"` accepted
+- [x] `""` (empty string) accepted
+- [x] `123` rejected — `"expected string, got number"`, `path: []`
+- [x] `null` rejected — `"expected string, got null"`, `path: []`
 
 **TODO — timestamp tests:**
 
-- [ ] `"1985-04-12T23:20:50.52Z"` accepted
-- [ ] `"1996-12-19T16:39:57-08:00"` accepted
-- [ ] `"1996-12-19T16:39:57.123-08:00"` accepted
-- [ ] `"foo"` rejected — `"expected timestamp, got string"`, `path: []`
-- [ ] `"2020-01-01"` (no time/timezone) rejected — `"expected timestamp, got string"`, `path: []`
-- [ ] `123` rejected — `"expected timestamp, got number"`, `path: []`
-- [ ] `null` rejected — `"expected timestamp, got null"`, `path: []`
+- [x] `"1985-04-12T23:20:50.52Z"` accepted
+- [x] `"1996-12-19T16:39:57-08:00"` accepted
+- [x] `"1996-12-19T16:39:57.123-08:00"` accepted
+- [x] `"foo"` rejected — `"expected timestamp, got string"`, `path: []`
+- [x] `"2020-01-01"` (no time/timezone) rejected — `"expected timestamp, got string"`, `path: []`
+- [x] `123` rejected — `"expected timestamp, got number"`, `path: []`
+- [x] `null` rejected — `"expected timestamp, got null"`, `path: []`
 
 ---
 
