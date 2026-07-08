@@ -9,3 +9,6 @@
 # https://docs.deno.com/runtime/reference/cli/coverage/
 coverage/
 *.lcov
+
+# External sources for test generation (RFCs, real examples, etc)
+sources/
