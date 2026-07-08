@@ -176,12 +176,12 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 
 **TODO:**
 
-- [ ] Each valid value accepted: `{ "enum": ["PENDING", "DONE", "CANCELED"] }` accepts `"PENDING"`, `"DONE"`, `"CANCELED"`
-- [ ] Unlisted string rejected: `"UNKNOWN"` → `"unexpected \"UNKNOWN\""`, suggestions `["PENDING", "DONE", "CANCELED"]`, `path: []`
-- [ ] Non-string value rejected: `123` → `"unexpected \"123\""`, suggestions `["PENDING", "DONE", "CANCELED"]`, `path: []`
-- [ ] `null` rejected — `"unexpected \"null\""`, suggestions `["PENDING", "DONE", "CANCELED"]`, `path: []`
-- [ ] With `nullable: true`: `null` accepted, `"PENDING"` still accepted, `"UNKNOWN"` still rejected
-- [ ] Single-value enum: `{ "enum": ["ONLY"] }` accepts `"ONLY"`, rejects `"OTHER"` with suggestions `["ONLY"]`
+- [x] Each valid value accepted: `{ "enum": ["PENDING", "DONE", "CANCELED"] }` accepts `"PENDING"`, `"DONE"`, `"CANCELED"`
+- [x] Unlisted string rejected: `"UNKNOWN"` → `"unexpected \"UNKNOWN\""`, suggestions `["PENDING", "DONE", "CANCELED"]`, `path: []`
+- [x] Non-string value rejected: `123` → `"unexpected \"123\""`, suggestions `["PENDING", "DONE", "CANCELED"]`, `path: []`
+- [x] `null` rejected — `"unexpected \"null\""`, suggestions `["PENDING", "DONE", "CANCELED"]`, `path: []`
+- [x] With `nullable: true`: `null` accepted, `"PENDING"` still accepted, `"UNKNOWN"` still rejected
+- [x] Single-value enum: `{ "enum": ["ONLY"] }` accepts `"ONLY"`, rejects `"OTHER"` with suggestions `["ONLY"]`
 
 ---
 
