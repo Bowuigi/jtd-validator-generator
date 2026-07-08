@@ -331,6 +331,16 @@ Each type gets at least: valid boundary values, invalid above/below boundary, fr
 - [x] More complex mapping with optionalProperties — from RFC §2.2.8 example
 - [x] All mapping variants accepted
 
+**TODO — Nested discriminators:**
+
+- [x] Properties containing discriminator: property value is a discriminator — valid accepted, errors at depth
+- [x] Values containing discriminator: values subschema is a discriminator — all valid, type mismatch at depth, unknown value at depth
+- [x] Elements containing discriminator: elements subschema is a discriminator — all valid, type mismatch at index
+- [x] Discriminator containing elements: mapping variant has elements property — error at array index under property
+- [x] Discriminator containing values: mapping variant has values property — error at map key under property
+- [x] Nested discriminator: discriminator mapping variant's property is another discriminator — valid, error at depth
+- [x] Nested discriminator: nullable at outer level still works with inner errors
+
 ---
 
 ## Task 8 — `tests/ref.test.ts`
