@@ -1,5 +1,4 @@
-import { assertEquals } from "@std/assert";
-import { testValidatorGeneration } from "./setup.ts";
+import { testCase } from "./setup.ts";
 
 const RFC_SCHEMA = {
   properties: { a: { type: "string" }, b: { type: "string" } },
@@ -8,178 +7,82 @@ const RFC_SCHEMA = {
 
 const RFC_ALL_PROPS = ["a", "b", "c", "d"];
 
-async function assertAccepted(schema: any, data: unknown) {
-  const result = await testValidatorGeneration(schema, data);
-  assertEquals(result, { success: true });
-}
+// Required properties
+testCase("properties all required present accepted", RFC_SCHEMA, { a: "x", b: "y" });
+testCase("properties missing required property", RFC_SCHEMA, { a: "x" }, [{ path: [], message: 'missing required property "b"', suggestions: [] }]);
+testCase("properties multiple missing required properties", RFC_SCHEMA, {}, [
+  { path: [], message: 'missing required property "a"', suggestions: [] },
+  { path: [], message: 'missing required property "b"', suggestions: [] },
+]);
+testCase("properties required property type mismatch", RFC_SCHEMA, { a: 3, b: "y" }, [{ path: ["a"], message: "expected string, got number", suggestions: [] }]);
 
-async function assertRejected(
-  schema: any,
-  data: unknown,
-  expectedErrors: Array<{ path: Array<string | number>; message: string; suggestions?: Array<string> }>,
-) {
-  const result = await testValidatorGeneration(schema, data);
-  assertEquals(result.success, false);
-  if (result.success) return;
-  const normalized = result.errors.map((e) => ({
-    ...e,
-    suggestions: e.suggestions ?? [],
-  }));
-  const expected = expectedErrors.map((e) => ({
-    path: e.path,
-    message: e.message,
-    suggestions: e.suggestions ?? [],
-  }));
-  assertEquals(normalized, expected);
-}
+// Optional properties
+testCase("properties all optional absent accepted", RFC_SCHEMA, { a: "x", b: "y" });
+testCase("properties optional present valid accepted", RFC_SCHEMA, { a: "x", b: "y", c: "z" });
+testCase("properties optional property type mismatch", RFC_SCHEMA, { a: "x", b: "y", c: 3 }, [{ path: ["c"], message: "expected string, got number", suggestions: [] }]);
 
-Deno.test("properties all required present accepted", async () => {
-  await assertAccepted(RFC_SCHEMA, { a: "x", b: "y" });
-});
+// RFC example combos
+testCase("properties RFC example accepts {a, b}", RFC_SCHEMA, { a: "x", b: "y" });
+testCase("properties RFC example accepts {a, b, c}", RFC_SCHEMA, { a: "x", b: "y", c: "z" });
+testCase("properties RFC example accepts {a, b, c, d}", RFC_SCHEMA, { a: "x", b: "y", c: "z", d: "w" });
+testCase("properties RFC example accepts {a, b, d}", RFC_SCHEMA, { a: "x", b: "y", d: "w" });
 
-Deno.test("properties missing required property", async () => {
-  await assertRejected(RFC_SCHEMA, { a: "x" }, [
-    { path: [], message: 'missing required property "b"', suggestions: [] },
-  ]);
-});
+// Additional properties
+testCase("properties unknown property rejected", RFC_SCHEMA, { a: "x", b: "y", e: 3 }, [{ path: ["e"], message: 'unexpected property "e"', suggestions: RFC_ALL_PROPS }]);
 
-Deno.test("properties multiple missing required properties", async () => {
-  await assertRejected(RFC_SCHEMA, {}, [
-    { path: [], message: 'missing required property "a"', suggestions: [] },
-    { path: [], message: 'missing required property "b"', suggestions: [] },
-  ]);
-});
+const RFC_ADDITIONAL = { ...RFC_SCHEMA, additionalProperties: true };
 
-Deno.test("properties required property type mismatch", async () => {
-  await assertRejected(RFC_SCHEMA, { a: 3, b: "y" }, [
-    { path: ["a"], message: "expected string, got number" },
-  ]);
-});
+testCase("properties additionalProperties true accepts unknown", RFC_ADDITIONAL, { a: "x", b: "y", e: 3 });
+testCase("properties additionalProperties true still validates known", RFC_ADDITIONAL, { a: 1, b: "y", e: 3 }, [{ path: ["a"], message: "expected string, got number", suggestions: [] }]);
+testCase("properties multiple unknown properties rejected", RFC_SCHEMA, { a: "x", b: "y", e: 3, f: "z" }, [
+  { path: ["e"], message: 'unexpected property "e"', suggestions: RFC_ALL_PROPS },
+  { path: ["f"], message: 'unexpected property "f"', suggestions: RFC_ALL_PROPS },
+]);
 
-Deno.test("properties all optional absent accepted", async () => {
-  await assertAccepted(RFC_SCHEMA, { a: "x", b: "y" });
-});
+// Not an object
+testCase("properties null rejected", RFC_SCHEMA, null, [{ path: [], message: "expected object", suggestions: [] }]);
+testCase('properties string rejected', RFC_SCHEMA, "string", [{ path: [], message: "expected object", suggestions: [] }]);
+testCase("properties number rejected", RFC_SCHEMA, 123, [{ path: [], message: "expected object", suggestions: [] }]);
 
-Deno.test("properties optional present valid accepted", async () => {
-  await assertAccepted(RFC_SCHEMA, { a: "x", b: "y", c: "z" });
-});
+// Multiple simultaneous errors
+testCase("properties RFC 3.3.6 multiple simultaneous errors", RFC_SCHEMA, { b: 3, c: 3, e: 3 }, [
+  { path: [], message: 'missing required property "a"', suggestions: [] },
+  { path: ["b"], message: "expected string, got number", suggestions: [] },
+  { path: ["c"], message: "expected string, got number", suggestions: [] },
+  { path: ["e"], message: 'unexpected property "e"', suggestions: RFC_ALL_PROPS },
+]);
+testCase("properties RFC 3.3.6 additionalProperties true filters unexpected", RFC_ADDITIONAL, { b: 3, c: 3, e: 3 }, [
+  { path: [], message: 'missing required property "a"', suggestions: [] },
+  { path: ["b"], message: "expected string, got number", suggestions: [] },
+  { path: ["c"], message: "expected string, got number", suggestions: [] },
+]);
 
-Deno.test("properties optional property type mismatch", async () => {
-  await assertRejected(RFC_SCHEMA, { a: "x", b: "y", c: 3 }, [
-    { path: ["c"], message: "expected string, got number" },
-  ]);
-});
+// Nullable
+const RFC_NULLABLE = { ...RFC_SCHEMA, nullable: true };
 
-Deno.test("properties RFC example all combos accepted", async () => {
-  await assertAccepted(RFC_SCHEMA, { a: "x", b: "y" });
-  await assertAccepted(RFC_SCHEMA, { a: "x", b: "y", c: "z" });
-  await assertAccepted(RFC_SCHEMA, { a: "x", b: "y", c: "z", d: "w" });
-  await assertAccepted(RFC_SCHEMA, { a: "x", b: "y", d: "w" });
-});
+testCase("properties nullable true accepts null", RFC_NULLABLE, null);
+testCase("properties nullable true still validates non-null", RFC_NULLABLE, { a: 1, b: "y" }, [{ path: ["a"], message: "expected string, got number", suggestions: [] }]);
 
-Deno.test("properties unknown property rejected", async () => {
-  await assertRejected(RFC_SCHEMA, { a: "x", b: "y", e: 3 }, [
-    { path: ["e"], message: 'unexpected property "e"', suggestions: RFC_ALL_PROPS },
-  ]);
-});
+// Edge cases
+const OPTIONAL_ONLY = { optionalProperties: { a: { type: "string" } } };
 
-Deno.test("properties additionalProperties true accepts unknown", async () => {
-  const schema = { ...RFC_SCHEMA, additionalProperties: true };
-  await assertAccepted(schema, { a: "x", b: "y", e: 3 });
-});
+testCase("properties only optionalProperties accepts empty object", OPTIONAL_ONLY, {});
+testCase("properties only optionalProperties accepts valid optional", OPTIONAL_ONLY, { a: "hello" });
+testCase("properties only optionalProperties rejects type mismatch", OPTIONAL_ONLY, { a: 1 }, [{ path: ["a"], message: "expected string, got number", suggestions: [] }]);
 
-Deno.test("properties additionalProperties true still validates known", async () => {
-  const schema = { ...RFC_SCHEMA, additionalProperties: true };
-  await assertRejected(schema, { a: 1, b: "y", e: 3 }, [
-    { path: ["a"], message: "expected string, got number" },
-  ]);
-});
+const REQUIRED_ONLY = { properties: { a: { type: "string" } } };
 
-Deno.test("properties multiple unknown properties rejected", async () => {
-  await assertRejected(RFC_SCHEMA, { a: "x", b: "y", e: 3, f: "z" }, [
-    { path: ["e"], message: 'unexpected property "e"', suggestions: RFC_ALL_PROPS },
-    { path: ["f"], message: 'unexpected property "f"', suggestions: RFC_ALL_PROPS },
-  ]);
-});
+testCase("properties only properties accepts valid", REQUIRED_ONLY, { a: "hello" });
+testCase("properties only properties rejects missing", REQUIRED_ONLY, {}, [{ path: [], message: 'missing required property "a"', suggestions: [] }]);
 
-Deno.test("properties null rejected", async () => {
-  await assertRejected(RFC_SCHEMA, null, [
-    { path: [], message: "expected object" },
-  ]);
-});
+const EMPTY_PROPS = { properties: {} };
 
-Deno.test('properties string rejected', async () => {
-  await assertRejected(RFC_SCHEMA, "string", [
-    { path: [], message: "expected object" },
-  ]);
-});
+testCase("properties empty properties accepts {}", EMPTY_PROPS, {});
+testCase("properties empty properties accepts extra keys", EMPTY_PROPS, { a: 1 });
 
-Deno.test("properties number rejected", async () => {
-  await assertRejected(RFC_SCHEMA, 123, [
-    { path: [], message: "expected object" },
-  ]);
-});
+testCase("properties array rejected (not object)", RFC_SCHEMA, [], [{ path: [], message: "expected object", suggestions: [] }]);
 
-Deno.test("properties RFC 3.3.6 multiple simultaneous errors", async () => {
-  await assertRejected(RFC_SCHEMA, { b: 3, c: 3, e: 3 }, [
-    { path: [], message: 'missing required property "a"', suggestions: [] },
-    { path: ["b"], message: "expected string, got number", suggestions: [] },
-    { path: ["c"], message: "expected string, got number", suggestions: [] },
-    { path: ["e"], message: 'unexpected property "e"', suggestions: RFC_ALL_PROPS },
-  ]);
-});
-
-Deno.test("properties RFC 3.3.6 additionalProperties true filters unexpected", async () => {
-  const schema = { ...RFC_SCHEMA, additionalProperties: true };
-  await assertRejected(schema, { b: 3, c: 3, e: 3 }, [
-    { path: [], message: 'missing required property "a"', suggestions: [] },
-    { path: ["b"], message: "expected string, got number", suggestions: [] },
-    { path: ["c"], message: "expected string, got number", suggestions: [] },
-  ]);
-});
-
-Deno.test("properties nullable true accepts null", async () => {
-  const schema = { ...RFC_SCHEMA, nullable: true };
-  const result = await testValidatorGeneration(schema, null);
-  assertEquals(result, { success: true });
-});
-
-Deno.test("properties nullable true still validates non-null", async () => {
-  const schema = { ...RFC_SCHEMA, nullable: true };
-  await assertRejected(schema, { a: 1, b: "y" }, [
-    { path: ["a"], message: "expected string, got number" },
-  ]);
-});
-
-Deno.test("properties only optionalProperties valid", async () => {
-  const schema = { optionalProperties: { a: { type: "string" } } };
-  await assertAccepted(schema, {});
-  await assertAccepted(schema, { a: "hello" });
-  await assertRejected(schema, { a: 1 }, [
-    { path: ["a"], message: "expected string, got number" },
-  ]);
-});
-
-Deno.test("properties only properties valid", async () => {
-  const schema = { properties: { a: { type: "string" } } };
-  await assertAccepted(schema, { a: "hello" });
-  await assertRejected(schema, {}, [
-    { path: [], message: 'missing required property "a"', suggestions: [] },
-  ]);
-});
-
-Deno.test("properties empty properties object has no required props", async () => {
-  const schema = { properties: {} };
-  await assertAccepted(schema, {});
-  await assertAccepted(schema, { a: 1 });
-});
-
-Deno.test("properties array rejected (not object)", async () => {
-  await assertRejected(RFC_SCHEMA, [], [
-    { path: [], message: "expected object" },
-  ]);
-});
-
+// Nested properties
 const NESTED_PROPS_SCHEMA = {
   properties: {
     user: {
@@ -189,52 +92,25 @@ const NESTED_PROPS_SCHEMA = {
   },
 };
 
-Deno.test("properties nested properties form accepted", async () => {
-  await assertAccepted(NESTED_PROPS_SCHEMA, { user: { id: "1", name: "Alice" } });
-  await assertAccepted(NESTED_PROPS_SCHEMA, { user: { id: "1", name: "Alice", email: "a@b.com" } });
-});
+testCase("properties nested properties accepts required only", NESTED_PROPS_SCHEMA, { user: { id: "1", name: "Alice" } });
+testCase("properties nested properties accepts with optional", NESTED_PROPS_SCHEMA, { user: { id: "1", name: "Alice", email: "a@b.com" } });
+testCase("properties nested properties missing deep required", NESTED_PROPS_SCHEMA, { user: { id: "1" } }, [{ path: ["user"], message: 'missing required property "name"', suggestions: [] }]);
+testCase("properties nested properties type mismatch at depth", NESTED_PROPS_SCHEMA, { user: { id: "1", name: 3 } }, [{ path: ["user", "name"], message: "expected string, got number", suggestions: [] }]);
+testCase("properties nested properties missing top-level required", NESTED_PROPS_SCHEMA, {}, [{ path: [], message: 'missing required property "user"', suggestions: [] }]);
 
-Deno.test("properties nested properties missing deep required", async () => {
-  await assertRejected(NESTED_PROPS_SCHEMA, { user: { id: "1" } }, [
-    { path: ["user"], message: 'missing required property "name"', suggestions: [] },
-  ]);
-});
-
-Deno.test("properties nested properties type mismatch at depth", async () => {
-  await assertRejected(NESTED_PROPS_SCHEMA, { user: { id: "1", name: 3 } }, [
-    { path: ["user", "name"], message: "expected string, got number" },
-  ]);
-});
-
-Deno.test("properties nested properties missing top-level required", async () => {
-  await assertRejected(NESTED_PROPS_SCHEMA, {}, [
-    { path: [], message: 'missing required property "user"', suggestions: [] },
-  ]);
-});
-
+// Nested elements
 const NESTED_ELEMS_SCHEMA = {
   properties: {
     tags: { elements: { type: "string" } },
   },
 };
 
-Deno.test("properties nested elements accepted", async () => {
-  await assertAccepted(NESTED_ELEMS_SCHEMA, { tags: [] });
-  await assertAccepted(NESTED_ELEMS_SCHEMA, { tags: ["a", "b"] });
-});
+testCase("properties nested elements accepts empty array", NESTED_ELEMS_SCHEMA, { tags: [] });
+testCase("properties nested elements accepts values", NESTED_ELEMS_SCHEMA, { tags: ["a", "b"] });
+testCase("properties nested elements type mismatch at index", NESTED_ELEMS_SCHEMA, { tags: [1] }, [{ path: ["tags", 0], message: "expected string, got number", suggestions: [] }]);
+testCase("properties nested elements not an array", NESTED_ELEMS_SCHEMA, { tags: "foo" }, [{ path: ["tags"], message: "expected array", suggestions: [] }]);
 
-Deno.test("properties nested elements type mismatch at index", async () => {
-  await assertRejected(NESTED_ELEMS_SCHEMA, { tags: [1] }, [
-    { path: ["tags", 0], message: "expected string, got number" },
-  ]);
-});
-
-Deno.test("properties nested elements not an array", async () => {
-  await assertRejected(NESTED_ELEMS_SCHEMA, { tags: "foo" }, [
-    { path: ["tags"], message: "expected array" },
-  ]);
-});
-
+// Mixed nesting
 const MIXED_SCHEMA = {
   properties: {
     items: {
@@ -245,34 +121,12 @@ const MIXED_SCHEMA = {
   },
 };
 
-Deno.test("properties mixed elements containing properties accepted", async () => {
-  await assertAccepted(MIXED_SCHEMA, { items: [] });
-  await assertAccepted(
-    MIXED_SCHEMA,
-    { items: [{ id: 1, label: "foo" }, { id: 2, label: "bar" }] },
-  );
-});
+testCase("properties mixed elements containing properties accepts empty", MIXED_SCHEMA, { items: [] });
+testCase("properties mixed elements containing properties accepts values", MIXED_SCHEMA, { items: [{ id: 1, label: "foo" }, { id: 2, label: "bar" }] });
+testCase("properties mixed type mismatch at element property", MIXED_SCHEMA, { items: [{ id: "bad", label: "foo" }] }, [{ path: ["items", 0, "id"], message: "expected float32, got string", suggestions: [] }]);
+testCase("properties mixed missing required at element property", MIXED_SCHEMA, { items: [{ id: 1 }] }, [{ path: ["items", 0], message: 'missing required property "label"', suggestions: [] }]);
 
-Deno.test("properties mixed type mismatch at element property", async () => {
-  await assertRejected(
-    MIXED_SCHEMA,
-    { items: [{ id: "bad", label: "foo" }] },
-    [
-      { path: ["items", 0, "id"], message: "expected float32, got string" },
-    ],
-  );
-});
-
-Deno.test("properties mixed missing required at element property", async () => {
-  await assertRejected(
-    MIXED_SCHEMA,
-    { items: [{ id: 1 }] },
-    [
-      { path: ["items", 0], message: 'missing required property "label"', suggestions: [] },
-    ],
-  );
-});
-
+// Deep triple nesting
 const DEEP_SCHEMA = {
   properties: {
     data: {
@@ -283,12 +137,5 @@ const DEEP_SCHEMA = {
   },
 };
 
-Deno.test("properties deep triple nesting accepted", async () => {
-  await assertAccepted(DEEP_SCHEMA, { data: [{ x: 1 }, { x: 2 }] });
-});
-
-Deno.test("properties deep triple nesting error at depth", async () => {
-  await assertRejected(DEEP_SCHEMA, { data: [{ x: "bad" }] }, [
-    { path: ["data", 0, "x"], message: "expected float32, got string" },
-  ]);
-});
+testCase("properties deep triple nesting accepted", DEEP_SCHEMA, { data: [{ x: 1 }, { x: 2 }] });
+testCase("properties deep triple nesting error at depth", DEEP_SCHEMA, { data: [{ x: "bad" }] }, [{ path: ["data", 0, "x"], message: "expected float32, got string", suggestions: [] }]);

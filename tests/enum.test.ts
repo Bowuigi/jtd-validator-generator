@@ -1,82 +1,21 @@
-import { assertEquals } from "@std/assert";
-import { testValidatorGeneration } from "./setup.ts";
-
-async function assertAccepted(schema: any, data: unknown) {
-  const result = await testValidatorGeneration(schema, data);
-  assertEquals(result, { success: true });
-}
-
-async function assertEnumRejected(
-  schema: any,
-  data: unknown,
-  expectedMessage: string,
-  expectedSuggestions: Array<string>,
-) {
-  const result = await testValidatorGeneration(schema, data);
-  assertEquals(result.success, false);
-  if (result.success) return;
-  assertEquals(result.errors, [{
-    path: [],
-    message: expectedMessage,
-    suggestions: expectedSuggestions,
-  }]);
-}
+import { testCase } from "./setup.ts";
 
 const STATUS_SCHEMA = { enum: ["PENDING", "DONE", "CANCELED"] };
 const STATUSES = ["PENDING", "DONE", "CANCELED"];
 
-Deno.test('enum accepts "PENDING"', async () => {
-  await assertAccepted(STATUS_SCHEMA, "PENDING");
-});
+for (const status of STATUSES) {
+  testCase(`enum accepts "${status}"`, STATUS_SCHEMA, status);
+}
 
-Deno.test('enum accepts "DONE"', async () => {
-  await assertAccepted(STATUS_SCHEMA, "DONE");
-});
+testCase('enum rejects "UNKNOWN"', STATUS_SCHEMA, "UNKNOWN", [{ path: [], message: 'unexpected "UNKNOWN"', suggestions: STATUSES }]);
+testCase("enum rejects 123", STATUS_SCHEMA, 123, [{ path: [], message: 'unexpected "123"', suggestions: STATUSES }]);
+testCase("enum rejects null", STATUS_SCHEMA, null, [{ path: [], message: 'unexpected "null"', suggestions: STATUSES }]);
 
-Deno.test('enum accepts "CANCELED"', async () => {
-  await assertAccepted(STATUS_SCHEMA, "CANCELED");
-});
+const NULLABLE_ENUM_SCHEMA = { enum: ["PENDING", "DONE", "CANCELED"], nullable: true };
 
-Deno.test('enum rejects "UNKNOWN"', async () => {
-  await assertEnumRejected(STATUS_SCHEMA, "UNKNOWN", 'unexpected "UNKNOWN"', STATUSES);
-});
+testCase("enum with nullable: true accepts null", NULLABLE_ENUM_SCHEMA, null);
+testCase('enum with nullable: true still accepts "PENDING"', NULLABLE_ENUM_SCHEMA, "PENDING");
+testCase('enum with nullable: true still rejects "UNKNOWN"', NULLABLE_ENUM_SCHEMA, "UNKNOWN", [{ path: [], message: 'unexpected "UNKNOWN"', suggestions: STATUSES }]);
 
-Deno.test("enum rejects 123", async () => {
-  await assertEnumRejected(STATUS_SCHEMA, 123, 'unexpected "123"', STATUSES);
-});
-
-Deno.test("enum rejects null", async () => {
-  await assertEnumRejected(STATUS_SCHEMA, null, 'unexpected "null"', STATUSES);
-});
-
-Deno.test("enum with nullable: true accepts null", async () => {
-  const result = await testValidatorGeneration(
-    { enum: ["PENDING", "DONE", "CANCELED"], nullable: true },
-    null,
-  );
-  assertEquals(result, { success: true });
-});
-
-Deno.test('enum with nullable: true still accepts "PENDING"', async () => {
-  await assertAccepted(
-    { enum: ["PENDING", "DONE", "CANCELED"], nullable: true },
-    "PENDING",
-  );
-});
-
-Deno.test('enum with nullable: true still rejects "UNKNOWN"', async () => {
-  await assertEnumRejected(
-    { enum: ["PENDING", "DONE", "CANCELED"], nullable: true },
-    "UNKNOWN",
-    'unexpected "UNKNOWN"',
-    STATUSES,
-  );
-});
-
-Deno.test('single-value enum accepts "ONLY"', async () => {
-  await assertAccepted({ enum: ["ONLY"] }, "ONLY");
-});
-
-Deno.test('single-value enum rejects "OTHER"', async () => {
-  await assertEnumRejected({ enum: ["ONLY"] }, "OTHER", 'unexpected "OTHER"', ["ONLY"]);
-});
+testCase('single-value enum accepts "ONLY"', { enum: ["ONLY"] }, "ONLY");
+testCase('single-value enum rejects "OTHER"', { enum: ["ONLY"] }, "OTHER", [{ path: [], message: 'unexpected "OTHER"', suggestions: ["ONLY"] }]);
