@@ -13,7 +13,7 @@ type EnumForm = BaseForm & { enum: Array<string> };
 type PropertiesForm = BaseForm & {
   properties?: Record<string, SomeForm>,
   optionalProperties?: Record<string, SomeForm>,
-  additionalProperties: boolean
+  additionalProperties?: boolean
 };
 type RefForm = BaseForm & { ref: string };
 type TypeForm = BaseForm & {
