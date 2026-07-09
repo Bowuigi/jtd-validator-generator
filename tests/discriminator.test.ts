@@ -1,6 +1,7 @@
+import type { Schema } from '@/mod.ts';
 import { testCase } from './setup.ts';
 
-const DISCRIMINATOR_SCHEMA = {
+const DISCRIMINATOR_SCHEMA: Schema = {
   discriminator: 'version',
   mapping: {
     v1: { properties: { a: { type: 'float32' } } },
@@ -50,7 +51,7 @@ testCase('discriminator extra property on mapping variant', DISCRIMINATOR_SCHEMA
   extra: 'x'
 }, [{ path: ['extra'], message: 'unexpected property "extra"', suggestions: [] }]);
 
-const NULLABLE_DISCRIMINATOR = { ...DISCRIMINATOR_SCHEMA, nullable: true };
+const NULLABLE_DISCRIMINATOR: Schema = { ...DISCRIMINATOR_SCHEMA, nullable: true };
 
 testCase('discriminator nullable: true accepts null', NULLABLE_DISCRIMINATOR, null);
 testCase('discriminator nullable: true non-null still validated', NULLABLE_DISCRIMINATOR, {
@@ -58,7 +59,7 @@ testCase('discriminator nullable: true non-null still validated', NULLABLE_DISCR
   a: 3
 }, [{ path: ['a'], message: 'expected string, got number', suggestions: [] }]);
 
-const COMPLEX_DISCRIMINATOR_SCHEMA = {
+const COMPLEX_DISCRIMINATOR_SCHEMA: Schema = {
   discriminator: 'event_type',
   mapping: {
     account_deleted: {
@@ -107,7 +108,7 @@ testCase('discriminator complex mapping missing required property', COMPLEX_DISC
 }, [{ path: [], message: 'missing required property "account_id"', suggestions: [] }]);
 
 // Nested discriminators
-const PROPS_CONTAINING_DISCRIMINATOR = {
+const PROPS_CONTAINING_DISCRIMINATOR: Schema = {
   properties: {
     data: {
       discriminator: 'type',
@@ -152,7 +153,7 @@ testCase(
   [{ path: ['data', 'extra'], message: 'unexpected property "extra"', suggestions: [] }]
 );
 
-const VALUES_CONTAINING_DISCRIMINATOR = {
+const VALUES_CONTAINING_DISCRIMINATOR: Schema = {
   values: {
     discriminator: 'kind',
     mapping: {
@@ -180,7 +181,7 @@ testCase(
   [{ path: ['key', 'kind'], message: 'unknown discriminator value "c"', suggestions: ['a', 'b'] }]
 );
 
-const ELEMS_CONTAINING_DISCRIMINATOR = {
+const ELEMS_CONTAINING_DISCRIMINATOR: Schema = {
   elements: {
     discriminator: 'type',
     mapping: {
@@ -202,7 +203,7 @@ testCase(
   [{ path: [0, 'id'], message: 'expected float32, got string', suggestions: [] }]
 );
 
-const DISCRIMINATOR_CONTAINING_ELEMS = {
+const DISCRIMINATOR_CONTAINING_ELEMS: Schema = {
   discriminator: 'type',
   mapping: {
     withArray: {
@@ -224,7 +225,7 @@ testCase(
   [{ path: ['items', 0], message: 'expected string, got number', suggestions: [] }]
 );
 
-const DISCRIMINATOR_CONTAINING_VALUES = {
+const DISCRIMINATOR_CONTAINING_VALUES: Schema = {
   discriminator: 'type',
   mapping: {
     withDict: {
@@ -246,7 +247,7 @@ testCase(
   [{ path: ['dict', 'x'], message: 'expected float32, got string', suggestions: [] }]
 );
 
-const NESTED_DISCRIMINATOR = {
+const NESTED_DISCRIMINATOR: Schema = {
   discriminator: 'outer',
   mapping: {
     inner: {

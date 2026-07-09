@@ -1,7 +1,8 @@
+import type { Schema } from '@/mod.ts';
 import { testCase } from './setup.ts';
 
 // Simple ref
-const SIMPLE_REF = {
+const SIMPLE_REF: Schema = {
   definitions: { a: { type: 'float32' } },
   ref: 'a'
 };
@@ -19,7 +20,7 @@ testCase('simple ref rejects null', SIMPLE_REF, null, [{
 }]);
 
 // Nullable ref
-const NULLABLE_REF = {
+const NULLABLE_REF: Schema = {
   definitions: { a: { type: 'float32' } },
   ref: 'a',
   nullable: true
@@ -34,7 +35,7 @@ testCase('nullable ref still rejects type mismatch', NULLABLE_REF, 'foo', [{
 }]);
 
 // Ref to properties
-const REF_TO_PROPERTIES = {
+const REF_TO_PROPERTIES: Schema = {
   definitions: {
     coords: {
       properties: {
@@ -55,7 +56,7 @@ testCase('ref to properties rejects with missing property and type error', REF_T
 ]);
 
 // Ref in elements
-const REF_IN_ELEMENTS = {
+const REF_IN_ELEMENTS: Schema = {
   definitions: { a: { type: 'float32' } },
   elements: { ref: 'a' }
 };
@@ -68,7 +69,7 @@ testCase('ref in elements rejects with error at index', REF_IN_ELEMENTS, [1, 'fo
 }]);
 
 // Ref in properties
-const REF_IN_PROPERTIES = {
+const REF_IN_PROPERTIES: Schema = {
   definitions: { coordinates: { type: 'float32' } },
   properties: {
     x: { ref: 'coordinates' },
@@ -79,7 +80,7 @@ const REF_IN_PROPERTIES = {
 testCase('ref in properties accepts valid object', REF_IN_PROPERTIES, { x: 1.0, y: 2.0 });
 
 // Recursive linked list
-const RECURSIVE_LIST = {
+const RECURSIVE_LIST: Schema = {
   definitions: {
     node: {
       properties: {
@@ -112,7 +113,7 @@ testCase('recursive list rejects invalid at depth', RECURSIVE_LIST, {
 ]);
 
 // Recursive JSON tree
-const RECURSIVE_TREE = {
+const RECURSIVE_TREE: Schema = {
   definitions: {
     treeNode: {
       properties: {

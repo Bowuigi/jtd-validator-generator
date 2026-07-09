@@ -1,6 +1,7 @@
+import type { Schema } from '@/mod.ts';
 import { testCase } from './setup.ts';
 
-const RFC_SCHEMA = {
+const RFC_SCHEMA: Schema = {
   properties: { a: { type: 'string' }, b: { type: 'string' } },
   optionalProperties: { c: { type: 'string' }, d: { type: 'string' } }
 };
@@ -51,7 +52,7 @@ testCase('properties unknown property rejected', RFC_SCHEMA, { a: 'x', b: 'y', e
   suggestions: RFC_ALL_PROPS
 }]);
 
-const RFC_ADDITIONAL = { ...RFC_SCHEMA, additionalProperties: true };
+const RFC_ADDITIONAL: Schema = { ...RFC_SCHEMA, additionalProperties: true };
 
 testCase('properties additionalProperties true accepts unknown', RFC_ADDITIONAL, {
   a: 'x',
@@ -108,7 +109,7 @@ testCase('properties RFC 3.3.6 additionalProperties true filters unexpected', RF
 ]);
 
 // Nullable
-const RFC_NULLABLE = { ...RFC_SCHEMA, nullable: true };
+const RFC_NULLABLE: Schema = { ...RFC_SCHEMA, nullable: true };
 
 testCase('properties nullable true accepts null', RFC_NULLABLE, null);
 testCase('properties nullable true still validates non-null', RFC_NULLABLE, { a: 1, b: 'y' }, [{
@@ -118,7 +119,7 @@ testCase('properties nullable true still validates non-null', RFC_NULLABLE, { a:
 }]);
 
 // Edge cases
-const OPTIONAL_ONLY = { optionalProperties: { a: { type: 'string' } } };
+const OPTIONAL_ONLY: Schema = { optionalProperties: { a: { type: 'string' } } };
 
 testCase('properties only optionalProperties accepts empty object', OPTIONAL_ONLY, {});
 testCase('properties only optionalProperties accepts valid optional', OPTIONAL_ONLY, {
@@ -130,7 +131,7 @@ testCase('properties only optionalProperties rejects type mismatch', OPTIONAL_ON
   suggestions: []
 }]);
 
-const REQUIRED_ONLY = { properties: { a: { type: 'string' } } };
+const REQUIRED_ONLY: Schema = { properties: { a: { type: 'string' } } };
 
 testCase('properties only properties accepts valid', REQUIRED_ONLY, { a: 'hello' });
 testCase('properties only properties rejects missing', REQUIRED_ONLY, {}, [{
@@ -139,7 +140,7 @@ testCase('properties only properties rejects missing', REQUIRED_ONLY, {}, [{
   suggestions: []
 }]);
 
-const EMPTY_PROPS = { properties: {} };
+const EMPTY_PROPS: Schema = { properties: {} };
 
 testCase('properties empty properties accepts {}', EMPTY_PROPS, {});
 testCase('properties empty properties accepts extra keys', EMPTY_PROPS, { a: 1 });
@@ -151,7 +152,7 @@ testCase('properties array rejected (not object)', RFC_SCHEMA, [], [{
 }]);
 
 // Nested properties
-const NESTED_PROPS_SCHEMA = {
+const NESTED_PROPS_SCHEMA: Schema = {
   properties: {
     user: {
       properties: { id: { type: 'string' }, name: { type: 'string' } },
@@ -179,7 +180,7 @@ testCase('properties nested properties missing top-level required', NESTED_PROPS
 }]);
 
 // Nested elements
-const NESTED_ELEMS_SCHEMA = {
+const NESTED_ELEMS_SCHEMA: Schema = {
   properties: {
     tags: { elements: { type: 'string' } }
   }
@@ -199,7 +200,7 @@ testCase('properties nested elements not an array', NESTED_ELEMS_SCHEMA, { tags:
 }]);
 
 // Mixed nesting
-const MIXED_SCHEMA = {
+const MIXED_SCHEMA: Schema = {
   properties: {
     items: {
       elements: {
@@ -223,7 +224,7 @@ testCase('properties mixed missing required at element property', MIXED_SCHEMA, 
 }, [{ path: ['items', 0], message: 'missing required property "label"', suggestions: [] }]);
 
 // Deep triple nesting
-const DEEP_SCHEMA = {
+const DEEP_SCHEMA: Schema = {
   properties: {
     data: {
       elements: {

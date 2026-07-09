@@ -1,6 +1,7 @@
+import type { Schema } from '@/mod.ts';
 import { testCase } from './setup.ts';
 
-const FLOAT32_VALUES_SCHEMA = { values: { type: 'float32' } };
+const FLOAT32_VALUES_SCHEMA: Schema = { values: { type: 'float32' } };
 
 testCase('values empty object {} accepted', FLOAT32_VALUES_SCHEMA, {});
 testCase('values all valid { a: 1, b: 2 } accepted', FLOAT32_VALUES_SCHEMA, { a: 1, b: 2 });
@@ -28,7 +29,7 @@ testCase('values multiple value type mismatches', FLOAT32_VALUES_SCHEMA, {
   { path: ['c'], message: 'expected float32, got string', suggestions: [] }
 ]);
 
-const NULLABLE_VALUES_SCHEMA = { values: { type: 'float32' }, nullable: true };
+const NULLABLE_VALUES_SCHEMA: Schema = { values: { type: 'float32' }, nullable: true };
 
 testCase('values nullable: true accepts null', NULLABLE_VALUES_SCHEMA, null);
 testCase('values nullable: true valid objects still work', NULLABLE_VALUES_SCHEMA, { a: 1, b: 2 });
@@ -38,7 +39,7 @@ testCase('values nullable: true invalid values still rejected', NULLABLE_VALUES_
 }, [{ path: ['b'], message: 'expected float32, got string', suggestions: [] }]);
 
 // Nested values
-const NESTED_VALUES_SCHEMA = { values: { values: { type: 'float32' } } };
+const NESTED_VALUES_SCHEMA: Schema = { values: { values: { type: 'float32' } } };
 
 testCase('values nested values accepted', NESTED_VALUES_SCHEMA, { a: { x: 1 }, b: { y: 2 } });
 testCase('values nested values type mismatch at depth', NESTED_VALUES_SCHEMA, { a: { x: 'foo' } }, [
@@ -46,7 +47,7 @@ testCase('values nested values type mismatch at depth', NESTED_VALUES_SCHEMA, { 
 ]);
 
 // Values containing properties
-const VALUES_CONTAINING_PROPS = {
+const VALUES_CONTAINING_PROPS: Schema = {
   values: {
     properties: { id: { type: 'float32' }, name: { type: 'string' } }
   }
@@ -67,7 +68,7 @@ testCase(
 );
 
 // Values containing elements
-const VALUES_CONTAINING_ELEMS = { values: { elements: { type: 'string' } } };
+const VALUES_CONTAINING_ELEMS: Schema = { values: { elements: { type: 'string' } } };
 
 testCase('values containing elements accepted', VALUES_CONTAINING_ELEMS, { a: ['x', 'y'], b: [] });
 testCase('values containing elements type mismatch at index', VALUES_CONTAINING_ELEMS, {
@@ -75,7 +76,7 @@ testCase('values containing elements type mismatch at index', VALUES_CONTAINING_
 }, [{ path: ['a', 1], message: 'expected string, got number', suggestions: [] }]);
 
 // Properties containing values
-const PROPS_CONTAINING_VALUES = {
+const PROPS_CONTAINING_VALUES: Schema = {
   properties: {
     data: { values: { type: 'float32' } }
   }
@@ -89,7 +90,7 @@ testCase('properties containing values type mismatch', PROPS_CONTAINING_VALUES, 
 }, [{ path: ['data', 'x'], message: 'expected float32, got string', suggestions: [] }]);
 
 // Elements containing values
-const ELEMS_CONTAINING_VALUES = {
+const ELEMS_CONTAINING_VALUES: Schema = {
   elements: { values: { type: 'float32' } }
 };
 

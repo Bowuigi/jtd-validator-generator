@@ -22,7 +22,7 @@ testCase('type boolean rejects null', { type: 'boolean' }, null, [{
 
 // --- float32 / float64 ---
 
-for (const t of ['float32', 'float64']) {
+for (const t of ['float32', 'float64'] as const) {
   testCase(`type ${t} accepts 0`, { type: t }, 0);
   testCase(`type ${t} accepts -3.14`, { type: t }, -3.14);
   testCase(`type ${t} accepts 1e10`, { type: t }, 1e10);
@@ -40,16 +40,19 @@ for (const t of ['float32', 'float64']) {
 
 // --- integer types ---
 
-const INT_TYPES: Record<string, { min: number, max: number }> = {
+const INT_TYPES = {
   int8: { min: -128, max: 127 },
   uint8: { min: 0, max: 255 },
   int16: { min: -32768, max: 32767 },
   uint16: { min: 0, max: 65535 },
   int32: { min: -2147483648, max: 2147483647 },
   uint32: { min: 0, max: 4294967295 }
-};
+} as const;
 
-for (const [type, { min, max }] of Object.entries(INT_TYPES)) {
+for (const [_type, { min, max }] of Object.entries(INT_TYPES)) {
+  // Typescript forgets the type otherwise
+  const type = _type as keyof typeof INT_TYPES;
+
   const isSigned = min !== 0;
 
   testCase(`type ${type} accepts 0`, { type }, 0);
