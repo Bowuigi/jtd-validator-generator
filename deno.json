@@ -20,7 +20,6 @@
         "explicit-module-boundary-types",
         "no-await-in-loop",
         "no-console",
-        "no-boolean-literal-for-arguments",
         "no-eval",
         "no-external-import",
         "no-inferrable-types",
@@ -60,10 +59,8 @@
     "noImplicitAny": true,
     "noImplicitReturns": true,
     "noUncheckedIndexedAccess": true,
-    "noUncheckedSideEffectImports": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "strict": true,
-    "noStrictGenericChecks": false
+    "strict": true
   }
 }
