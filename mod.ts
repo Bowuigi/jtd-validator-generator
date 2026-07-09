@@ -5,7 +5,7 @@ type BaseForm = {
 
 type DiscriminatorForm = BaseForm & {discriminator: string, mapping: Record<string, PropertiesForm>};
 type ElementsForm = BaseForm & {elements: SomeForm};
-type EmptyForm = BaseForm & {};
+type EmptyForm = BaseForm;
 type EnumForm = BaseForm & {enum: Array<string>};
 type PropertiesForm = BaseForm & {properties?: Record<string, SomeForm>, optionalProperties?: Record<string, SomeForm>, additionalProperties: boolean};
 type RefForm = BaseForm & {ref: string};
