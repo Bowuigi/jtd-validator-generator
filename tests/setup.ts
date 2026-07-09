@@ -1,11 +1,11 @@
 import { assertEquals, assertFalse } from "@std/assert";
-import { generateCode } from '../mod.ts';
+import { generateCode, type Schema } from '../mod.ts';
 
 export type ValidationResult =
   | { success: true }
   | { success: false, errors: Array<{ path: Array<string | number>, message: string, suggestions: Array<string> }> };
 
-export async function testValidatorGeneration(schema: any, data: unknown) {
+export async function testValidatorGeneration(schema: Schema, data: unknown): Promise<ValidationResult> {
   const code = generateCode(schema);
   const blob = new Blob([code], { type: "application/typescript" });
   const url = URL.createObjectURL(blob);
@@ -17,10 +17,10 @@ export async function testValidatorGeneration(schema: any, data: unknown) {
 
 export function testCase(
   name: string,
-  schema: any,
+  schema: Schema,
   data: unknown,
   expectedErrors?: Array<{ path: Array<string | number>; message: string; suggestions: Array<string> }>,
-) {
+): void {
   Deno.test(name, async () => {
     const result = await testValidatorGeneration(schema, data);
     if (expectedErrors === undefined) {
