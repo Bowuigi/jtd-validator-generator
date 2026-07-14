@@ -14,12 +14,12 @@ testCase('enum rejects "UNKNOWN"', STATUS_SCHEMA, 'UNKNOWN', [{
 }]);
 testCase('enum rejects 123', STATUS_SCHEMA, 123, [{
   path: [],
-  message: 'unexpected "123"',
+  message: 'unexpected number',
   suggestions: STATUSES
 }]);
 testCase('enum rejects null', STATUS_SCHEMA, null, [{
   path: [],
-  message: 'unexpected "null"',
+  message: 'unexpected null',
   suggestions: STATUSES
 }]);
 
