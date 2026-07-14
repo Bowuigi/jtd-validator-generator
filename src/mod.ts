@@ -1,3 +1,5 @@
+import * as CG from '@/codegen.ts';
+
 type BaseForm = {
   nullable?: boolean,
   metadata?: Record<string, unknown>
@@ -46,6 +48,28 @@ export type Schema = {
   definitions?: Record<string, SomeForm>
 } & SomeForm;
 
-export function generateCode(_schema: Schema): string {
-  return 'export function validate(data: unknown) {return {success: false, errors: []};}';
+function generateEnum(options: Array<string>): CG.AST {
+  return CG.formBlock(
+    'enum',
+    { enum_: CG.array(options) },
+    CG.ifElse(
+      CG.dataIs('string'),
+      CG.unless('enum_.includes(data)', CG.pushError('unexpected "${data}"', 'enum_')),
+      CG.pushError('unexpected ${data === null ? "null" : typeof data}', 'enum_')
+    )
+  );
+}
+
+function onForm(form: SomeForm): CG.AST {
+  if ('enum' in form) {
+    return generateEnum(form.enum);
+  }
+  throw Error('Unreachable code reached, possibly due to an invalid JTD schema');
+}
+
+export function generateCode(schema: Schema): string {
+  const definitions = Object.entries(schema.definitions ?? {}).map(([defn, value]) =>
+    CG.validatorFunction(`_${defn}`, onForm(value))
+  );
+  return CG.renderProgram([CG.validatorFunction('Main', onForm(schema)), ...definitions]);
 }
