@@ -73,7 +73,7 @@ for (const [_type, { min, max }] of Object.entries(INT_TYPES)) {
   }]);
   testCase(`type ${type} rejects 10.5 (fractional)`, { type }, 10.5, [{
     path: [],
-    message: `expected integer for ${type}, got 10.5`,
+    message: `value 10.5 is not an ${type.startsWith('u') ? 'unsigned ' : ''}integer`,
     suggestions: []
   }]);
   testCase(`type ${type} rejects "abc" (wrong JSON type)`, { type }, 'abc', [{
