@@ -61,10 +61,20 @@ function generateEnum(options: Array<string>): CG.AST {
 }
 
 function onForm(form: SomeForm): CG.AST {
-  if ('enum' in form) {
-    return generateEnum(form.enum);
+  const appended: /* mutable */ Array<CG.AST> = [];
+
+  if (form.nullable) {
+    appended.push(CG.when(CG.dataIs('null'), CG.earlyReturn()));
   }
-  throw Error('Unreachable code reached, possibly due to an invalid JTD schema');
+
+  if ('enum' in form) {
+    appended.push(generateEnum(form.enum));
+  }
+
+  if (appended.length === 0) {
+    throw Error('Unreachable code reached, possibly due to an invalid JTD schema');
+  }
+  return CG.seq(appended);
 }
 
 export function generateCode(schema: Schema): string {

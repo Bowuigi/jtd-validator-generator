@@ -5,11 +5,14 @@ export type AST =
   | { is: 'validatorFunction', name: string, body: AST }
   | { is: 'formBlock', form: string, bindings: Record<string, AST>, body: AST }
   | { is: 'ifElse', cond: AST, ifTrue: AST, ifFalse: AST }
+  | { is: 'when', cond: AST, ifTrue: AST }
   | { is: 'unless', cond: AST, ifFalse: AST }
   | { is: 'dataIs', type: string }
   | { is: 'pushError', msg: string, suggestions: AST }
   | { is: 'extendPath', extensions: Array<string>, body: AST }
-  | { is: 'array', items: Array<string> };
+  | { is: 'array', items: Array<string> }
+  | { is: 'earlyReturn' }
+  | { is: 'seq', statements: Array<AST> };
 
 //// Smart constructors
 
@@ -21,6 +24,9 @@ export function formBlock(form: string, bindings: Record<string, AST>, body: AST
 }
 export function ifElse(cond: AST, ifTrue: AST, ifFalse: AST): AST {
   return { is: 'ifElse', cond, ifTrue, ifFalse };
+}
+export function when(cond: AST, ifTrue: AST): AST {
+  return { is: 'when', cond, ifTrue };
 }
 export function unless(cond: AST, ifFalse: AST): AST {
   return { is: 'unless', cond, ifFalse };
@@ -36,6 +42,12 @@ export function extendPath(extensions: Array<string>, body: AST): AST {
 }
 export function array(items: Array<string>): AST {
   return { is: 'array', items };
+}
+export function earlyReturn(): AST {
+  return { is: 'earlyReturn' };
+}
+export function seq(statements: Array<AST>): AST {
+  return { is: 'seq', statements };
 }
 
 //// Rendering
@@ -58,10 +70,16 @@ function render(ast: AST): string {
     }
     case 'ifElse':
       return `if (${render(ast.cond)}) {${render(ast.ifTrue)}} else {${render(ast.ifFalse)}}`;
+    case 'when':
+      return `if (${render(ast.cond)}) {${render(ast.ifTrue)}}`;
     case 'unless':
       return `if (! ${render(ast.cond)}) {${render(ast.ifFalse)}}`;
     case 'dataIs':
-      return `(typeof data === '${ast.type}')`;
+      if (ast.type === 'null') {
+        return `(data === null)`;
+      } else {
+        return `(typeof data === '${ast.type}')`;
+      }
     case 'pushError': {
       return `errors.push({path, message: \`${ast.msg}\`, suggestions: ${
         render(ast.suggestions)
@@ -73,6 +91,10 @@ function render(ast: AST): string {
     }
     case 'array':
       return `[${ast.items.map((x) => `"${x}"`).join(', ')}]`;
+    case 'earlyReturn':
+      return 'return;';
+    case 'seq':
+      return ast.statements.map(render).join(' ');
   }
 }
 
@@ -83,7 +105,7 @@ type Errors = Array<{ path: Array<string | number>, message: string, suggestions
 
 export function validate(data: unknown) {
   const path: Path = [];
-  const errors: Errors = [];
+  const errors: /* mutable */ Errors = [];
 
   validateMain(data, path, errors);
 
