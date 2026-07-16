@@ -59,7 +59,7 @@ function render(ast: AST): string {
 
   switch (ast.is) {
     case 'validatorFunction':
-      return `function validate${ast.name}(data: unknown, path: Path, errors: Errors) {${
+      return `function validate${ast.name}(data: unknown, path: Path, errors: Errors): void {${
         render(ast.body)
       }}`;
     case 'formBlock': {
@@ -102,9 +102,10 @@ function render(ast: AST): string {
 export function renderProgram(validatorFunctions: Array<AST>): string {
   const entrypoint = `\
 type Path = Array<string | number>;
-type Errors = Array<{ path: Array<string | number>, message: string, suggestions: Array<string> }>;
+type Errors = Array<{ path: Path, message: string, suggestions: Array<string> }>;
+export type ValidationResult = { success: true } | { success: false, errors: Errors };
 
-export function validate(data: unknown) {
+export function validate(data: unknown): ValidationResult {
   const path: /* mutable */ Path = [];
   const errors: /* mutable */ Errors = [];
 
