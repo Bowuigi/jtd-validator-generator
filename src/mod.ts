@@ -119,7 +119,6 @@ function generateType(type: TypeForm['type']): CG.AST {
         CG.pushError(`expected ${type}, got ${interpolatedTypeOfData}`, CG.array([]))
       );
   }
-  return CG.pushError('NYI', CG.array([]));
 }
 
 function generateEnum(options: Array<string>): CG.AST {
