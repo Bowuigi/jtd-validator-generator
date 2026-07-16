@@ -146,7 +146,7 @@ function onForm(form: SomeForm): CG.AST {
     appended.push(generateType(form.type));
   }
 
-  if (appended.length === 0) {
+  if (appended.length === 0 || (form.nullable && appended.length === 1)) {
     throw Error('Unreachable code reached, possibly due to an invalid JTD schema');
   }
   return CG.seq(appended);
