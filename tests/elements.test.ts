@@ -7,17 +7,17 @@ testCase('elements empty array [] accepted', FLOAT32_SCHEMA, []);
 testCase('elements all-valid array [1, 2, 3] accepted', FLOAT32_SCHEMA, [1, 2, 3]);
 testCase('elements rejects null (not an array)', FLOAT32_SCHEMA, null, [{
   path: [],
-  message: 'expected array',
+  message: 'expected array, got null',
   suggestions: []
 }]);
 testCase('elements rejects {} (not an array)', FLOAT32_SCHEMA, {}, [{
   path: [],
-  message: 'expected array',
+  message: 'expected array, got object',
   suggestions: []
 }]);
 testCase('elements rejects "foo" (not an array)', FLOAT32_SCHEMA, 'foo', [{
   path: [],
-  message: 'expected array',
+  message: 'expected array, got string',
   suggestions: []
 }]);
 testCase("elements single element type mismatch [1, 'foo']", FLOAT32_SCHEMA, [1, 'foo'], [{
