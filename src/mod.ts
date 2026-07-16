@@ -49,6 +49,22 @@ export type Schema = {
 } & SomeForm;
 
 const interpolatedTypeOfData = '${data === null ? "null" : typeof data}';
+const interpolatedTypeOfKey = '${key === null ? "null" : typeof key}';
+
+function generateValues(values: SomeForm): CG.AST {
+  return CG.ifElse(
+    CG.dataIs('json_object'),
+    CG.iterateOver(
+      'Object.entries(data)',
+      CG.ifElse(
+        '(typeof key === "string")',
+        onForm(values),
+        CG.pushError(`expected string key, got ${interpolatedTypeOfKey}`, CG.array([]))
+      )
+    ),
+    CG.pushError(`expected JSON object, got ${interpolatedTypeOfData}`, CG.array([]))
+  );
+}
 
 function generateElements(elements: SomeForm): CG.AST {
   return CG.ifElse(
@@ -152,6 +168,8 @@ function onForm(form: SomeForm): CG.AST {
     return continuation(generateType(form.type));
   } else if ('elements' in form) {
     return continuation(generateElements(form.elements));
+  } else if ('values' in form) {
+    return continuation(generateValues(form.values));
   } else {
     throw Error('Unreachable code reached, possibly due to an invalid JTD schema');
   }

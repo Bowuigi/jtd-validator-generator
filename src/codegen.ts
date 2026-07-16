@@ -8,7 +8,7 @@ export type AST =
   | { is: 'iterateOver', iterator: AST, body: AST }
   | { is: 'when', cond: AST, ifTrue: AST }
   | { is: 'unless', cond: AST, ifFalse: AST }
-  | { is: 'dataIs', type: string }
+  | { is: 'dataIs', type: 'null' | 'boolean' | 'number' | 'string' | 'array' | 'json_object' }
   | { is: 'pushError', msg: string, suggestions: AST }
   | { is: 'array', items: Array<string> };
 
@@ -32,7 +32,7 @@ export function when(cond: AST, ifTrue: AST): AST {
 export function unless(cond: AST, ifFalse: AST): AST {
   return { is: 'unless', cond, ifFalse };
 }
-export function dataIs(type: string): AST {
+export function dataIs(type: 'null' | 'boolean' | 'number' | 'string' | 'array' | 'json_object'): AST {
   return { is: 'dataIs', type };
 }
 export function pushError(msg: string, suggestions: AST): AST {
@@ -71,9 +71,11 @@ function render(ast: AST): string {
     case 'dataIs':
       switch (ast.type) {
         case 'array':
-          return `(Array.isArray(data))`;
+          return '(Array.isArray(data))';
+        case 'json_object':
+          return '(typeof data === "object" && data !== null && Object.getPrototypeOf(data) === Object.prototype)';
         case 'null':
-          return `(data === null)`;
+          return '(data === null)';
         default:
           return `(typeof data === '${ast.type}')`;
       }
