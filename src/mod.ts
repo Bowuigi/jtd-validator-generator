@@ -50,6 +50,14 @@ export type Schema = {
 
 const interpolatedTypeOfData = '${data === null ? "null" : typeof data}';
 
+function generateElements(elements: SomeForm): CG.AST {
+  return CG.ifElse(
+    CG.dataIs('array'),
+    CG.iterateOver('data.entries()', onForm(elements)),
+    CG.pushError(`expected array, got ${interpolatedTypeOfData}`, CG.array([]))
+  );
+}
+
 function generateType(type: TypeForm['type']): CG.AST {
   const ranges = {
     float32: { min: -3.40282347e+38, max: 3.4028234663852886e+38 },
@@ -144,6 +152,8 @@ function onForm(form: SomeForm): CG.AST {
     appended.push(generateEnum(form.enum));
   } else if ('type' in form) {
     appended.push(generateType(form.type));
+  } else if ('elements' in form) {
+    appended.push(generateElements(form.elements));
   }
 
   if (appended.length === 0 || (form.nullable && appended.length === 1)) {

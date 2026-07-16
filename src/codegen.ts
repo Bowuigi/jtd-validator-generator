@@ -5,11 +5,11 @@ export type AST =
   | { is: 'validatorFunction', name: string, body: AST }
   | { is: 'formBlock', form: string, bindings: Record<string, AST>, body: AST }
   | { is: 'ifElse', cond: AST, ifTrue: AST, ifFalse: AST }
+  | { is: 'iterateOver', iterator: AST, body: AST }
   | { is: 'when', cond: AST, ifTrue: AST }
   | { is: 'unless', cond: AST, ifFalse: AST }
   | { is: 'dataIs', type: string }
   | { is: 'pushError', msg: string, suggestions: AST }
-  | { is: 'extendPath', extensions: Array<string>, body: AST }
   | { is: 'array', items: Array<string> }
   | { is: 'earlyReturn' }
   | { is: 'seq', statements: Array<AST> };
@@ -25,6 +25,9 @@ export function formBlock(form: string, bindings: Record<string, AST>, body: AST
 export function ifElse(cond: AST, ifTrue: AST, ifFalse: AST): AST {
   return { is: 'ifElse', cond, ifTrue, ifFalse };
 }
+export function iterateOver(iterator: AST, body: AST): AST {
+  return { is: 'iterateOver', iterator, body };
+}
 export function when(cond: AST, ifTrue: AST): AST {
   return { is: 'when', cond, ifTrue };
 }
@@ -36,9 +39,6 @@ export function dataIs(type: string): AST {
 }
 export function pushError(msg: string, suggestions: AST): AST {
   return { is: 'pushError', msg, suggestions };
-}
-export function extendPath(extensions: Array<string>, body: AST): AST {
-  return { is: 'extendPath', extensions, body };
 }
 export function array(items: Array<string>): AST {
   return { is: 'array', items };
@@ -70,24 +70,25 @@ function render(ast: AST): string {
     }
     case 'ifElse':
       return `if (${render(ast.cond)}) {${render(ast.ifTrue)}} else {${render(ast.ifFalse)}}`;
+    case 'iterateOver':
+      return `for (const [key, value] of ${render(ast.iterator)}) {path.push(key); const data = value; ${render(ast.body)}; path.pop()}`;
     case 'when':
       return `if (${render(ast.cond)}) {${render(ast.ifTrue)}}`;
     case 'unless':
       return `if (! ${render(ast.cond)}) {${render(ast.ifFalse)}}`;
     case 'dataIs':
-      if (ast.type === 'null') {
-        return `(data === null)`;
-      } else {
-        return `(typeof data === '${ast.type}')`;
+      switch (ast.type) {
+        case 'array':
+          return `(Array.isArray(data))`;
+        case 'null':
+          return `(data === null)`;
+        default:
+          return `(typeof data === '${ast.type}')`;
       }
     case 'pushError': {
-      return `errors.push({path, message: \`${ast.msg}\`, suggestions: ${
+      return `errors.push({path: [...path], message: \`${ast.msg}\`, suggestions: ${
         render(ast.suggestions)
       }});`;
-    }
-    case 'extendPath': {
-      const newPath = `[...oldPath, ${ast.extensions.map((x) => `"${x}"`).join(', ')}]`;
-      return `const oldPath = path; const path = ${newPath}; ${render(ast.body)}`;
     }
     case 'array':
       return `[${ast.items.map((x) => `"${x}"`).join(', ')}]`;
@@ -104,7 +105,7 @@ type Path = Array<string | number>;
 type Errors = Array<{ path: Array<string | number>, message: string, suggestions: Array<string> }>;
 
 export function validate(data: unknown) {
-  const path: Path = [];
+  const path: /* mutable */ Path = [];
   const errors: /* mutable */ Errors = [];
 
   validateMain(data, path, errors);
