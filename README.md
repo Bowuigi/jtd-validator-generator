@@ -6,6 +6,10 @@ The project is far from usable at the moment.
 
 Its main purpose is serving as [Justify](https://github.com/Bowuigi/Justify)'s JSON format validator, replacing [Ajv](https://ajv.js.org/)'s JTD compiled output.
 
+# Specification divergences
+
+- `type: "timestamp"` validation based on [this StackOverflow answer](https://stackoverflow.com/a/28022901), with the same caveats (no 0000-0999 years, no leap second, offset limited to +/- 19:59) though support for fractional seconds was added. This solution was chosen because it works for basically every use of timestamps; if it's not enough for your usecase, please create an Issue.
+
 # Licensing
 
 The project is licensed under BSD-3-Clause.

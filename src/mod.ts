@@ -69,8 +69,16 @@ function generateType(type: TypeForm['type']): CG.AST {
         CG.pushError(`expected ${type}, got ${interpolatedTypeOfData}`, CG.array([]))
       );
 
+    // NOTE: Based on https://stackoverflow.com/a/28022901 , same caveats apply (no 0000-0999 year, no leap second, offset limited to +/- 19:59) though support for fractional seconds was added using `(?:\\.[0-9]+)?`
     case 'timestamp':
-      return CG.pushError('timestamp NYI', CG.array([]));
+      return CG.ifElse(
+        CG.dataIs('string'),
+        CG.unless(
+          '(/^(?:[1-9]\\d{3}-(?:(?:0[1-9]|1[0-2])-(?:0[1-9]|1\\d|2[0-8])|(?:0[13-9]|1[0-2])-(?:29|30)|(?:0[13578]|1[02])-31)|(?:[1-9]\\d(?:0[48]|[2468][048]|[13579][26])|(?:[2468][048]|[13579][26])00)-02-29)T(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.[0-9]+)?(?:Z|[+-][01]\\d:[0-5]\\d)$/.test(data))',
+          CG.pushError('expected timestamp, got string', CG.array([]))
+        ),
+        CG.pushError(`expected timestamp, got ${interpolatedTypeOfData}`, CG.array([]))
+      );
 
     // NOTE: NaN and +/- Infinity do not exist in JSON, so this is the same as Number.isFinite
     case 'float64':
