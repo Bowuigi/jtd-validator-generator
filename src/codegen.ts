@@ -10,9 +10,7 @@ export type AST =
   | { is: 'unless', cond: AST, ifFalse: AST }
   | { is: 'dataIs', type: string }
   | { is: 'pushError', msg: string, suggestions: AST }
-  | { is: 'array', items: Array<string> }
-  | { is: 'earlyReturn' }
-  | { is: 'seq', statements: Array<AST> };
+  | { is: 'array', items: Array<string> };
 
 //// Smart constructors
 
@@ -42,12 +40,6 @@ export function pushError(msg: string, suggestions: AST): AST {
 }
 export function array(items: Array<string>): AST {
   return { is: 'array', items };
-}
-export function earlyReturn(): AST {
-  return { is: 'earlyReturn' };
-}
-export function seq(statements: Array<AST>): AST {
-  return { is: 'seq', statements };
 }
 
 //// Rendering
@@ -92,10 +84,6 @@ function render(ast: AST): string {
     }
     case 'array':
       return `[${ast.items.map((x) => `"${x}"`).join(', ')}]`;
-    case 'earlyReturn':
-      return 'return;';
-    case 'seq':
-      return ast.statements.map(render).join(' ');
   }
 }
 

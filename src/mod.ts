@@ -142,24 +142,19 @@ function generateEnum(options: Array<string>): CG.AST {
 }
 
 function onForm(form: SomeForm): CG.AST {
-  const appended: /* mutable */ Array<CG.AST> = [];
-
-  if (form.nullable) {
-    appended.push(CG.when(CG.dataIs('null'), CG.earlyReturn()));
-  }
+  const continuation: (rest: CG.AST) => CG.AST = form.nullable
+    ? (rest) => CG.unless(CG.dataIs('null'), rest)
+    : (rest) => rest;
 
   if ('enum' in form) {
-    appended.push(generateEnum(form.enum));
+    return continuation(generateEnum(form.enum));
   } else if ('type' in form) {
-    appended.push(generateType(form.type));
+    return continuation(generateType(form.type));
   } else if ('elements' in form) {
-    appended.push(generateElements(form.elements));
-  }
-
-  if (appended.length === 0 || (form.nullable && appended.length === 1)) {
+    return continuation(generateElements(form.elements));
+  } else {
     throw Error('Unreachable code reached, possibly due to an invalid JTD schema');
   }
-  return CG.seq(appended);
 }
 
 export function generateCode(schema: Schema): string {
