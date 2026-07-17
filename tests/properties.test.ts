@@ -77,17 +77,17 @@ testCase('properties multiple unknown properties rejected', RFC_SCHEMA, {
 // Not an object
 testCase('properties null rejected', RFC_SCHEMA, null, [{
   path: [],
-  message: 'expected object',
+  message: 'expected JSON object, got null',
   suggestions: []
 }]);
 testCase('properties string rejected', RFC_SCHEMA, 'string', [{
   path: [],
-  message: 'expected object',
+  message: 'expected JSON object, got string',
   suggestions: []
 }]);
 testCase('properties number rejected', RFC_SCHEMA, 123, [{
   path: [],
-  message: 'expected object',
+  message: 'expected JSON object, got number',
   suggestions: []
 }]);
 
@@ -147,7 +147,7 @@ testCase('properties empty properties accepts extra keys', EMPTY_PROPS, { a: 1 }
 
 testCase('properties array rejected (not object)', RFC_SCHEMA, [], [{
   path: [],
-  message: 'expected object',
+  message: 'expected JSON object, got array',
   suggestions: []
 }]);
 

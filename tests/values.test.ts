@@ -7,12 +7,12 @@ testCase('values empty object {} accepted', FLOAT32_VALUES_SCHEMA, {});
 testCase('values all valid { a: 1, b: 2 } accepted', FLOAT32_VALUES_SCHEMA, { a: 1, b: 2 });
 testCase('values rejects null (not an object)', FLOAT32_VALUES_SCHEMA, null, [{
   path: [],
-  message: 'expected object',
+  message: 'expected JSON object, got null',
   suggestions: []
 }]);
 testCase('values rejects "foo" (not an object)', FLOAT32_VALUES_SCHEMA, 'foo', [{
   path: [],
-  message: 'expected object',
+  message: 'expected JSON object, got string',
   suggestions: []
 }]);
 testCase('values single value type mismatch', FLOAT32_VALUES_SCHEMA, { a: 1, b: 'foo' }, [{

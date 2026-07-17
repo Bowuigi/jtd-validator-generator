@@ -18,12 +18,12 @@ testCase(
 );
 testCase('discriminator null rejected (not an object)', DISCRIMINATOR_SCHEMA, null, [{
   path: [],
-  message: 'expected object',
+  message: 'expected JSON object, got null',
   suggestions: []
 }]);
 testCase('discriminator string rejected (not an object)', DISCRIMINATOR_SCHEMA, 'string', [{
   path: [],
-  message: 'expected object',
+  message: 'expected JSON object, got string',
   suggestions: []
 }]);
 testCase('discriminator missing discriminator tag', DISCRIMINATOR_SCHEMA, {}, [{

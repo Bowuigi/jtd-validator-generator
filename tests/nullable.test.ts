@@ -45,19 +45,19 @@ testCase(
   'nullable: false on enum form still rejects null',
   { enum: ['A'], nullable: false },
   null,
-  [{ path: [], message: 'unexpected "null"', suggestions: ['A'] }]
+  [{ path: [], message: 'unexpected null', suggestions: ['A'] }]
 );
 testCase(
   'nullable: false on elements form still rejects null',
   { elements: { type: 'string' }, nullable: false },
   null,
-  [{ path: [], message: 'expected array', suggestions: [] }]
+  [{ path: [], message: 'expected array, got null', suggestions: [] }]
 );
 testCase(
   'nullable: false on properties form still rejects null',
   { properties: { a: { type: 'string' } }, nullable: false },
   null,
-  [{ path: [], message: 'expected object', suggestions: [] }]
+  [{ path: [], message: 'expected JSON object, got null', suggestions: [] }]
 );
 
 // nullable omitted means no null accepted
@@ -68,23 +68,23 @@ testCase('type form without nullable rejects null', { type: 'string' }, null, [{
 }]);
 testCase('enum form without nullable rejects null', { enum: ['A'] }, null, [{
   path: [],
-  message: 'unexpected "null"',
+  message: 'unexpected null',
   suggestions: ['A']
 }]);
 testCase('elements form without nullable rejects null', { elements: { type: 'string' } }, null, [{
   path: [],
-  message: 'expected array',
+  message: 'expected array, got null',
   suggestions: []
 }]);
 testCase(
   'properties form without nullable rejects null',
   { properties: { a: { type: 'string' } } },
   null,
-  [{ path: [], message: 'expected object', suggestions: [] }]
+  [{ path: [], message: 'expected JSON object, null', suggestions: [] }]
 );
 testCase('values form without nullable rejects null', { values: { type: 'string' } }, null, [{
   path: [],
-  message: 'expected object',
+  message: 'expected JSON object, got null',
   suggestions: []
 }]);
 testCase(
@@ -94,7 +94,7 @@ testCase(
     mapping: { a: { properties: { b: { type: 'string' } } } }
   },
   null,
-  [{ path: [], message: 'expected object', suggestions: [] }]
+  [{ path: [], message: 'expected JSON object, got null', suggestions: [] }]
 );
 
 // nullable: true does not leak to child schemas
