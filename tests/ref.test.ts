@@ -1,4 +1,4 @@
-import type { Schema } from '@/mod.ts';
+import type { Schema } from '@/types.ts';
 import { testCase } from './setup.ts';
 
 // Simple ref

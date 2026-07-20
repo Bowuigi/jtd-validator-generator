@@ -1,5 +1,6 @@
 import { assertEquals, assertFalse } from '@std/assert';
-import { generateCode, type Schema } from '@/mod.ts';
+import { generateCode } from '@/lib.ts';
+import type { Schema } from '@/types.ts';
 
 export type ValidationResult =
   | { success: true }
