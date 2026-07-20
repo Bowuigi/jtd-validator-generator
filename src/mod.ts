@@ -57,11 +57,6 @@ const interpolatedTypeOfData =
   '${data === null ? "null" : (Array.isArray(data) ? "array" : typeof data)}';
 const interpolatedTypeOfKey = '${key === null ? "null" : typeof key}';
 
-function generateRef(ref: string): CG.AST {
-  void ref;
-  throw new Error('Function not implemented.');
-}
-
 function generateDiscriminator(
   discriminator: string,
   mapping: Record<string, PropertiesForm>
@@ -296,7 +291,7 @@ function onForm(form: SomeForm): CG.AST {
   } else if ('discriminator' in form) {
     return continuation(generateDiscriminator(form.discriminator, form.mapping));
   } else if ('ref' in form) {
-    return continuation(generateRef(form.ref));
+    return continuation(CG.callValidatorFunction(`_${form.ref}`));
   } else { // empty form
     return '/* empty */';
   }

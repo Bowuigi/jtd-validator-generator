@@ -3,6 +3,7 @@
 export type AST =
   | string
   | { is: 'validatorFunction', name: string, body: AST }
+  | { is: 'callValidatorFunction', name: string }
   | { is: 'formBlock', form: string, bindings: Record<string, AST>, body: AST }
   | { is: 'ifElse', cond: AST, ifTrue: AST, ifFalse: AST }
   | { is: 'iterateOver', iterator: AST, body: AST }
@@ -19,6 +20,9 @@ export type AST =
 
 export function validatorFunction(name: string, body: AST): AST {
   return { is: 'validatorFunction', name, body };
+}
+export function callValidatorFunction(name: string): AST {
+  return { is: 'callValidatorFunction', name };
 }
 export function formBlock(form: string, bindings: Record<string, AST>, body: AST): AST {
   return { is: 'formBlock', form, bindings, body };
@@ -68,6 +72,8 @@ function render(ast: AST): string {
       return `function validate${ast.name}(data: unknown, path: Path, errors: Errors): void {${
         render(ast.body)
       }}`;
+    case 'callValidatorFunction':
+      return `validate${ast.name}(data, path, errors);`;
     case 'formBlock': {
       const bindings = Object.entries(ast.bindings).map(([variable, value]) =>
         `const ${variable} = ${render(value)}`
