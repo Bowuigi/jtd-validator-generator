@@ -52,10 +52,50 @@ const interpolatedTypeOfData =
   '${data === null ? "null" : (Array.isArray(data) ? "array" : typeof data)}';
 const interpolatedTypeOfKey = '${key === null ? "null" : typeof key}';
 
+function generateDiscriminator(
+  discriminator: string,
+  mapping: Record<string, PropertiesForm>
+): CG.AST {
+  const statements: Array<CG.AST> = [];
+
+  statements.push(
+    CG.ifElse(
+      `"${discriminator}" in data`,
+      CG.overProperty(discriminator, generateEnum(Object.keys(mapping))),
+      CG.pushError(`missing discriminator "${discriminator}"`, CG.array(Object.keys(mapping)))
+    )
+  );
+
+  statements.push(
+    CG.matchString(
+      `data.${discriminator}`,
+      Object.entries(mapping).map((
+        [key, props]
+      ) => [
+        key,
+        generateProperties(
+          props.properties,
+          props.optionalProperties,
+          props.additionalProperties,
+          discriminator
+        )
+      ])
+    )
+  );
+
+  return CG.ifElse(
+    CG.dataIs('json_object'),
+    CG.seq(statements),
+    CG.pushError(`expected JSON object, got ${interpolatedTypeOfData}`, CG.array([]))
+  );
+}
+
+// NOTE: exemptDiscriminatorProperty is only set if called from a discriminator form
 function generateProperties(
   properties?: Record<string, SomeForm>,
   optionalProperties?: Record<string, SomeForm>,
-  additionalProperties?: boolean
+  additionalProperties?: boolean,
+  exemptDiscriminatorProperty?: string
 ): CG.AST {
   const statements: Array<CG.AST> = [];
 
@@ -82,6 +122,11 @@ function generateProperties(
     const requiredPropertiesSet = new Set(Object.keys(properties ?? {}));
     const optionalPropertiesSet = new Set(Object.keys(optionalProperties ?? {}));
     const allowedProperties = requiredPropertiesSet.union(optionalPropertiesSet);
+
+    if (exemptDiscriminatorProperty !== undefined) {
+      allowedProperties.add(exemptDiscriminatorProperty);
+    }
+
     statements.push(
       CG.formBlock(
         'properties',
@@ -101,11 +146,16 @@ function generateProperties(
     );
   }
 
-  return CG.ifElse(
-    CG.dataIs('json_object'),
-    CG.seq(statements),
-    CG.pushError(`expected JSON object, got ${interpolatedTypeOfData}`, CG.array([]))
-  );
+  if (exemptDiscriminatorProperty === undefined) {
+    return CG.ifElse(
+      CG.dataIs('json_object'),
+      CG.seq(statements),
+      CG.pushError(`expected JSON object, got ${interpolatedTypeOfData}`, CG.array([]))
+    );
+  } else {
+    // json_object checking performed on the discriminator form
+    return CG.seq(statements);
+  }
 }
 
 function generateValues(values: SomeForm): CG.AST {
@@ -233,6 +283,8 @@ function onForm(form: SomeForm): CG.AST {
     return continuation(
       generateProperties(form.properties, form.optionalProperties, form.additionalProperties)
     );
+  } else if ('discriminator' in form) {
+    return continuation(generateDiscriminator(form.discriminator, form.mapping));
   } else {
     throw Error('Unreachable code reached, possibly due to an invalid JTD schema');
   }

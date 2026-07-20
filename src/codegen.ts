@@ -9,6 +9,7 @@ export type AST =
   | { is: 'overProperty', propertyName: string, body: AST }
   | { is: 'when', cond: AST, ifTrue: AST }
   | { is: 'unless', cond: AST, ifFalse: AST }
+  | { is: 'matchString', matcher: AST, patterns: Array<[string, AST]> }
   | { is: 'seq', statements: Array<AST> }
   | { is: 'dataIs', type: 'null' | 'boolean' | 'number' | 'string' | 'array' | 'json_object' }
   | { is: 'pushError', msg: string, suggestions: AST }
@@ -36,6 +37,9 @@ export function when(cond: AST, ifTrue: AST): AST {
 }
 export function unless(cond: AST, ifFalse: AST): AST {
   return { is: 'unless', cond, ifFalse };
+}
+export function matchString(matcher: AST, patterns: Array<[string, AST]>): AST {
+  return { is: 'matchString', matcher, patterns };
 }
 export function seq(statements: Array<AST>): AST {
   return { is: 'seq', statements };
@@ -73,11 +77,13 @@ function render(ast: AST): string {
     case 'iterateOver':
       return `for (const [key, value] of ${render(ast.iterator)}) {path.push(key); const data = value; ${render(ast.body)}; path.pop();}`;
     case 'overProperty':
-      return `((data: unknown): void => {path.push("${ast.propertyName}"); ${render(ast.body)}; path.pop();})(data.${ast.propertyName})`;
+      return `((data: unknown): void => {path.push("${ast.propertyName}"); ${render(ast.body)}; path.pop();})(data.${ast.propertyName});`;
     case 'when':
       return `if (${render(ast.cond)}) {${render(ast.ifTrue)}}`;
     case 'unless':
       return `if (! ${render(ast.cond)}) {${render(ast.ifFalse)}}`;
+    case 'matchString':
+      return `switch (${render(ast.matcher)}) {${ast.patterns.map(([pat, body]) => `case "${pat}": {${render(body)} break;}`).join(' ')}}`;
     case 'seq':
       return ast.statements.map(render).join(' ');
     case 'dataIs':
