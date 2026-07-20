@@ -5,6 +5,16 @@ type BaseForm = {
   metadata?: Record<string, unknown>
 };
 
+type PropertiesForm =
+  & BaseForm
+  & { additionalProperties?: boolean }
+  & ({
+    properties: Record<string, SomeForm>,
+    optionalProperties?: Record<string, SomeForm>
+  } | {
+    properties?: Record<string, SomeForm>,
+    optionalProperties: Record<string, SomeForm>
+  });
 type DiscriminatorForm = BaseForm & {
   discriminator: string,
   mapping: Record<string, PropertiesForm>
@@ -12,11 +22,6 @@ type DiscriminatorForm = BaseForm & {
 type ElementsForm = BaseForm & { elements: SomeForm };
 type EmptyForm = BaseForm;
 type EnumForm = BaseForm & { enum: Array<string> };
-type PropertiesForm = BaseForm & {
-  properties?: Record<string, SomeForm>,
-  optionalProperties?: Record<string, SomeForm>,
-  additionalProperties?: boolean
-};
 type RefForm = BaseForm & { ref: string };
 type TypeForm = BaseForm & {
   type:
@@ -51,6 +56,11 @@ export type Schema = {
 const interpolatedTypeOfData =
   '${data === null ? "null" : (Array.isArray(data) ? "array" : typeof data)}';
 const interpolatedTypeOfKey = '${key === null ? "null" : typeof key}';
+
+function generateRef(ref: string): CG.AST {
+  void ref;
+  throw new Error('Function not implemented.');
+}
 
 function generateDiscriminator(
   discriminator: string,
@@ -278,15 +288,17 @@ function onForm(form: SomeForm): CG.AST {
   } else if ('values' in form) {
     return continuation(generateValues(form.values));
   } else if (
-    'properties' in form || 'optionalProperties' in form || 'additionalProperties' in form
+    'properties' in form || 'optionalProperties' in form
   ) {
     return continuation(
       generateProperties(form.properties, form.optionalProperties, form.additionalProperties)
     );
   } else if ('discriminator' in form) {
     return continuation(generateDiscriminator(form.discriminator, form.mapping));
-  } else {
-    throw Error('Unreachable code reached, possibly due to an invalid JTD schema');
+  } else if ('ref' in form) {
+    return continuation(generateRef(form.ref));
+  } else { // empty form
+    return '/* empty */';
   }
 }
 
