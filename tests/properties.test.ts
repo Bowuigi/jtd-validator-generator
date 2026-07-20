@@ -47,8 +47,8 @@ testCase('properties RFC example accepts {a, b, d}', RFC_SCHEMA, { a: 'x', b: 'y
 
 // Additional properties
 testCase('properties unknown property rejected', RFC_SCHEMA, { a: 'x', b: 'y', e: 3 }, [{
-  path: ['e'],
-  message: 'unexpected property "e"',
+  path: [],
+  message: 'unexpected properties: "e"',
   suggestions: RFC_ALL_PROPS
 }]);
 
@@ -70,8 +70,7 @@ testCase('properties multiple unknown properties rejected', RFC_SCHEMA, {
   e: 3,
   f: 'z'
 }, [
-  { path: ['e'], message: 'unexpected property "e"', suggestions: RFC_ALL_PROPS },
-  { path: ['f'], message: 'unexpected property "f"', suggestions: RFC_ALL_PROPS }
+  { path: [], message: 'unexpected properties: "e", "f"', suggestions: RFC_ALL_PROPS },
 ]);
 
 // Not an object
@@ -96,7 +95,7 @@ testCase('properties RFC 3.3.6 multiple simultaneous errors', RFC_SCHEMA, { b: 3
   { path: [], message: 'missing required property "a"', suggestions: [] },
   { path: ['b'], message: 'expected string, got number', suggestions: [] },
   { path: ['c'], message: 'expected string, got number', suggestions: [] },
-  { path: ['e'], message: 'unexpected property "e"', suggestions: RFC_ALL_PROPS }
+  { path: [], message: 'unexpected properties: "e"', suggestions: RFC_ALL_PROPS }
 ]);
 testCase('properties RFC 3.3.6 additionalProperties true filters unexpected', RFC_ADDITIONAL, {
   b: 3,
@@ -143,7 +142,11 @@ testCase('properties only properties rejects missing', REQUIRED_ONLY, {}, [{
 const EMPTY_PROPS: Schema = { properties: {} };
 
 testCase('properties empty properties accepts {}', EMPTY_PROPS, {});
-testCase('properties empty properties accepts extra keys', EMPTY_PROPS, { a: 1 });
+testCase('properties empty properties rejects extra keys', EMPTY_PROPS, { a: 1 }, [{
+  path: [],
+  message: 'unexpected properties: "a"',
+  suggestions: [],
+}]);
 
 testCase('properties array rejected (not object)', RFC_SCHEMA, [], [{
   path: [],
@@ -195,7 +198,7 @@ testCase('properties nested elements type mismatch at index', NESTED_ELEMS_SCHEM
 }]);
 testCase('properties nested elements not an array', NESTED_ELEMS_SCHEMA, { tags: 'foo' }, [{
   path: ['tags'],
-  message: 'expected array',
+  message: 'expected array, got string',
   suggestions: []
 }]);
 

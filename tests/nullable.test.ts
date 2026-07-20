@@ -80,7 +80,7 @@ testCase(
   'properties form without nullable rejects null',
   { properties: { a: { type: 'string' } } },
   null,
-  [{ path: [], message: 'expected JSON object, null', suggestions: [] }]
+  [{ path: [], message: 'expected JSON object, got null', suggestions: [] }]
 );
 testCase('values form without nullable rejects null', { values: { type: 'string' } }, null, [{
   path: [],

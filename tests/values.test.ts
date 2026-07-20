@@ -62,8 +62,8 @@ testCase(
   VALUES_CONTAINING_PROPS,
   { a: { id: 'bad' } },
   [
-    { path: ['a'], message: 'missing required property "name"', suggestions: [] },
-    { path: ['a', 'id'], message: 'expected float32, got string', suggestions: [] }
+    { path: ['a', 'id'], message: 'expected float32, got string', suggestions: [] },
+    { path: ['a'], message: 'missing required property "name"', suggestions: [] }
   ]
 );
 
