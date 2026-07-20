@@ -51,8 +51,8 @@ testCase('ref to properties accepts valid object', REF_TO_PROPERTIES, { lat: 1.0
 testCase('ref to properties rejects with missing property and type error', REF_TO_PROPERTIES, {
   lat: 'foo'
 }, [
-  { path: [], message: 'missing required property "lng"', suggestions: [] },
-  { path: ['lat'], message: 'expected float32, got string', suggestions: [] }
+  { path: ['lat'], message: 'expected float32, got string', suggestions: [] },
+  { path: [], message: 'missing required property "lng"', suggestions: [] }
 ]);
 
 // Ref in elements
