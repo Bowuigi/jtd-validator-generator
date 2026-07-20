@@ -44,7 +44,9 @@ export function matchString(matcher: AST, patterns: Array<[string, AST]>): AST {
 export function seq(statements: Array<AST>): AST {
   return { is: 'seq', statements };
 }
-export function dataIs(type: 'null' | 'boolean' | 'number' | 'string' | 'array' | 'json_object'): AST {
+export function dataIs(
+  type: 'null' | 'boolean' | 'number' | 'string' | 'array' | 'json_object'
+): AST {
   return { is: 'dataIs', type };
 }
 export function pushError(msg: string, suggestions: AST): AST {
@@ -75,15 +77,21 @@ function render(ast: AST): string {
     case 'ifElse':
       return `if (${render(ast.cond)}) {${render(ast.ifTrue)}} else {${render(ast.ifFalse)}}`;
     case 'iterateOver':
-      return `for (const [key, value] of ${render(ast.iterator)}) {path.push(key); const data = value; ${render(ast.body)}; path.pop();}`;
+      return `for (const [key, value] of ${
+        render(ast.iterator)
+      }) {path.push(key); const data = value; ${render(ast.body)}; path.pop();}`;
     case 'overProperty':
-      return `((data: unknown): void => {path.push("${ast.propertyName}"); ${render(ast.body)}; path.pop();})(data.${ast.propertyName});`;
+      return `((data: unknown): void => {path.push("${ast.propertyName}"); ${
+        render(ast.body)
+      }; path.pop();})(data.${ast.propertyName});`;
     case 'when':
       return `if (${render(ast.cond)}) {${render(ast.ifTrue)}}`;
     case 'unless':
       return `if (! ${render(ast.cond)}) {${render(ast.ifFalse)}}`;
     case 'matchString':
-      return `switch (${render(ast.matcher)}) {${ast.patterns.map(([pat, body]) => `case "${pat}": {${render(body)} break;}`).join(' ')}}`;
+      return `switch (${render(ast.matcher)}) {${
+        ast.patterns.map(([pat, body]) => `case "${pat}": {${render(body)} break;}`).join(' ')
+      }}`;
     case 'seq':
       return ast.statements.map(render).join(' ');
     case 'dataIs':

@@ -70,7 +70,7 @@ testCase('properties multiple unknown properties rejected', RFC_SCHEMA, {
   e: 3,
   f: 'z'
 }, [
-  { path: [], message: 'unexpected properties: "e", "f"', suggestions: RFC_ALL_PROPS },
+  { path: [], message: 'unexpected properties: "e", "f"', suggestions: RFC_ALL_PROPS }
 ]);
 
 // Not an object
@@ -145,7 +145,7 @@ testCase('properties empty properties accepts {}', EMPTY_PROPS, {});
 testCase('properties empty properties rejects extra keys', EMPTY_PROPS, { a: 1 }, [{
   path: [],
   message: 'unexpected properties: "a"',
-  suggestions: [],
+  suggestions: []
 }]);
 
 testCase('properties array rejected (not object)', RFC_SCHEMA, [], [{
