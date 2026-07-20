@@ -11,11 +11,6 @@ const DISCRIMINATOR_SCHEMA: Schema = {
 
 testCase('discriminator valid v1 accepted', DISCRIMINATOR_SCHEMA, { version: 'v1', a: 1.5 });
 testCase('discriminator valid v2 accepted', DISCRIMINATOR_SCHEMA, { version: 'v2', a: 'hello' });
-testCase(
-  'discriminator tag exemption - discriminator key not flagged as extra',
-  DISCRIMINATOR_SCHEMA,
-  { version: 'v1', a: 1.5 }
-);
 testCase('discriminator null rejected (not an object)', DISCRIMINATOR_SCHEMA, null, [{
   path: [],
   message: 'expected JSON object, got null',
@@ -33,12 +28,12 @@ testCase('discriminator missing discriminator tag', DISCRIMINATOR_SCHEMA, {}, [{
 }]);
 testCase('discriminator tag not a string', DISCRIMINATOR_SCHEMA, { version: 1 }, [{
   path: ['version'],
-  message: 'discriminator must be a string',
-  suggestions: []
+  message: 'unexpected number',
+  suggestions: ['v1', 'v2']
 }]);
 testCase('discriminator unknown discriminator value', DISCRIMINATOR_SCHEMA, { version: 'v3' }, [{
   path: ['version'],
-  message: 'unknown discriminator value "v3"',
+  message: 'unexpected "v3"',
   suggestions: ['v1', 'v2']
 }]);
 testCase('discriminator property type mismatch in mapping', DISCRIMINATOR_SCHEMA, {
@@ -49,7 +44,7 @@ testCase('discriminator extra property on mapping variant', DISCRIMINATOR_SCHEMA
   version: 'v1',
   a: 1.5,
   extra: 'x'
-}, [{ path: ['extra'], message: 'unexpected property "extra"', suggestions: [] }]);
+}, [{ path: [], message: 'unexpected properties: "extra"', suggestions: ['a', 'version'] }]);
 
 const NULLABLE_DISCRIMINATOR: Schema = { ...DISCRIMINATOR_SCHEMA, nullable: true };
 
@@ -102,7 +97,11 @@ testCase('discriminator complex mapping extra property rejected', COMPLEX_DISCRI
   account_id: 'abc-123',
   payment_plan: 'PAID',
   xxx: 'asdf'
-}, [{ path: ['xxx'], message: 'unexpected property "xxx"', suggestions: [] }]);
+}, [{
+  path: [],
+  message: 'unexpected properties: "xxx"',
+  suggestions: ['account_id', 'payment_plan', 'upgraded_by', 'event_type']
+}]);
 testCase('discriminator complex mapping missing required property', COMPLEX_DISCRIMINATOR_SCHEMA, {
   event_type: 'account_deleted'
 }, [{ path: [], message: 'missing required property "account_id"', suggestions: [] }]);
@@ -136,7 +135,7 @@ testCase(
   { data: { type: 'baz' } },
   [{
     path: ['data', 'type'],
-    message: 'unknown discriminator value "baz"',
+    message: 'unexpected "baz"',
     suggestions: ['foo', 'bar']
   }]
 );
@@ -150,7 +149,7 @@ testCase(
   'discriminator nested inside properties - extra property on variant at depth',
   PROPS_CONTAINING_DISCRIMINATOR,
   { data: { type: 'foo', x: 1.5, extra: 'x' } },
-  [{ path: ['data', 'extra'], message: 'unexpected property "extra"', suggestions: [] }]
+  [{ path: ['data'], message: 'unexpected properties: "extra"', suggestions: ['x', 'type'] }]
 );
 
 const VALUES_CONTAINING_DISCRIMINATOR: Schema = {
@@ -178,7 +177,7 @@ testCase(
   'discriminator nested inside values - unknown discriminator value at depth',
   VALUES_CONTAINING_DISCRIMINATOR,
   { key: { kind: 'c' } },
-  [{ path: ['key', 'kind'], message: 'unknown discriminator value "c"', suggestions: ['a', 'b'] }]
+  [{ path: ['key', 'kind'], message: 'unexpected "c"', suggestions: ['a', 'b'] }]
 );
 
 const ELEMS_CONTAINING_DISCRIMINATOR: Schema = {
