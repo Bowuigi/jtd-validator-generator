@@ -48,8 +48,65 @@ export type Schema = {
   definitions?: Record<string, SomeForm>
 } & SomeForm;
 
-const interpolatedTypeOfData = '${data === null ? "null" : typeof data}';
+const interpolatedTypeOfData =
+  '${data === null ? "null" : (Array.isArray(data) ? "array" : typeof data)}';
 const interpolatedTypeOfKey = '${key === null ? "null" : typeof key}';
+
+function generateProperties(
+  properties?: Record<string, SomeForm>,
+  optionalProperties?: Record<string, SomeForm>,
+  additionalProperties?: boolean
+): CG.AST {
+  const statements: Array<CG.AST> = [];
+
+  for (const [propName, propForm] of Object.entries(properties ?? {})) {
+    statements.push(
+      CG.ifElse(
+        `"${propName}" in data`,
+        CG.overProperty(propName, onForm(propForm)),
+        CG.pushError(`missing required property "${propName}"`, CG.array([]))
+      )
+    );
+  }
+
+  for (const [propName, propForm] of Object.entries(optionalProperties ?? {})) {
+    statements.push(
+      CG.when(
+        `"${propName}" in data`,
+        CG.overProperty(propName, onForm(propForm))
+      )
+    );
+  }
+
+  if (!additionalProperties) {
+    const requiredPropertiesSet = new Set(Object.keys(properties ?? {}));
+    const optionalPropertiesSet = new Set(Object.keys(optionalProperties ?? {}));
+    const allowedProperties = requiredPropertiesSet.union(optionalPropertiesSet);
+    statements.push(
+      CG.formBlock(
+        'properties',
+        {
+          dataKeys: `new Set(Object.keys(data))`,
+          allowedKeys: `new Set([${[...allowedProperties].map((s) => `"${s}"`).join(', ')}])`,
+          extraKeys: `dataKeys.difference(allowedKeys)`
+        },
+        CG.when(
+          `(extraKeys.size > 0)`,
+          CG.pushError(
+            'unexpected properties: "${[...extraKeys].map(x => x.toString()).join(\'", "\')}"',
+            '[...allowedKeys]'
+          )
+        )
+      )
+    );
+  }
+
+  return CG.ifElse(
+    CG.dataIs('json_object'),
+    CG.seq(statements),
+    CG.pushError(`expected JSON object, got ${interpolatedTypeOfData}`, CG.array([]))
+  );
+}
 
 function generateValues(values: SomeForm): CG.AST {
   return CG.ifElse(
@@ -170,6 +227,12 @@ function onForm(form: SomeForm): CG.AST {
     return continuation(generateElements(form.elements));
   } else if ('values' in form) {
     return continuation(generateValues(form.values));
+  } else if (
+    'properties' in form || 'optionalProperties' in form || 'additionalProperties' in form
+  ) {
+    return continuation(
+      generateProperties(form.properties, form.optionalProperties, form.additionalProperties)
+    );
   } else {
     throw Error('Unreachable code reached, possibly due to an invalid JTD schema');
   }

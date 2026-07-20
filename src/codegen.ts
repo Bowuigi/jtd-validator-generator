@@ -6,8 +6,10 @@ export type AST =
   | { is: 'formBlock', form: string, bindings: Record<string, AST>, body: AST }
   | { is: 'ifElse', cond: AST, ifTrue: AST, ifFalse: AST }
   | { is: 'iterateOver', iterator: AST, body: AST }
+  | { is: 'overProperty', propertyName: string, body: AST }
   | { is: 'when', cond: AST, ifTrue: AST }
   | { is: 'unless', cond: AST, ifFalse: AST }
+  | { is: 'seq', statements: Array<AST> }
   | { is: 'dataIs', type: 'null' | 'boolean' | 'number' | 'string' | 'array' | 'json_object' }
   | { is: 'pushError', msg: string, suggestions: AST }
   | { is: 'array', items: Array<string> };
@@ -26,11 +28,17 @@ export function ifElse(cond: AST, ifTrue: AST, ifFalse: AST): AST {
 export function iterateOver(iterator: AST, body: AST): AST {
   return { is: 'iterateOver', iterator, body };
 }
+export function overProperty(propertyName: string, body: AST): AST {
+  return { is: 'overProperty', propertyName, body };
+}
 export function when(cond: AST, ifTrue: AST): AST {
   return { is: 'when', cond, ifTrue };
 }
 export function unless(cond: AST, ifFalse: AST): AST {
   return { is: 'unless', cond, ifFalse };
+}
+export function seq(statements: Array<AST>): AST {
+  return { is: 'seq', statements };
 }
 export function dataIs(type: 'null' | 'boolean' | 'number' | 'string' | 'array' | 'json_object'): AST {
   return { is: 'dataIs', type };
@@ -63,11 +71,15 @@ function render(ast: AST): string {
     case 'ifElse':
       return `if (${render(ast.cond)}) {${render(ast.ifTrue)}} else {${render(ast.ifFalse)}}`;
     case 'iterateOver':
-      return `for (const [key, value] of ${render(ast.iterator)}) {path.push(key); const data = value; ${render(ast.body)}; path.pop()}`;
+      return `for (const [key, value] of ${render(ast.iterator)}) {path.push(key); const data = value; ${render(ast.body)}; path.pop();}`;
+    case 'overProperty':
+      return `((data: unknown): void => {path.push("${ast.propertyName}"); ${render(ast.body)}; path.pop();})(data.${ast.propertyName})`;
     case 'when':
       return `if (${render(ast.cond)}) {${render(ast.ifTrue)}}`;
     case 'unless':
       return `if (! ${render(ast.cond)}) {${render(ast.ifFalse)}}`;
+    case 'seq':
+      return ast.statements.map(render).join(' ');
     case 'dataIs':
       switch (ast.type) {
         case 'array':
