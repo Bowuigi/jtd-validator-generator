@@ -1,4 +1,7 @@
 {
+  "name": "@bowuigi/jtd-validator-generator",
+  "version": "1.0.0",
+  "license": "BSD-3-Clause",
   "minimumDependencyAge": "P3D",
   "exports": "./src/entrypoint.ts",
   "lint": {
