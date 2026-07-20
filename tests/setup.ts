@@ -1,6 +1,12 @@
-import { assertEquals, assertFalse } from '@std/assert';
-import { generateCode } from '@/lib.ts';
-import type { Schema } from '@/types.ts';
+import { generateCode } from '../src/lib.ts';
+import type { Schema } from '../src/types.ts';
+
+export type { Schema };
+
+// deno-lint-ignore no-external-import
+import { test } from 'node:test';
+// deno-lint-ignore no-external-import
+import * as assert from 'node:assert';
 
 export type ValidationResult =
   | { success: true }
@@ -30,13 +36,12 @@ export function testCase(
     { path: Array<string | number>, message: string, suggestions: Array<string> }
   >
 ): void {
-  Deno.test(name, async () => {
+  test(name, { plan: 1 }, async () => {
     const result = await testValidatorGeneration(schema, data);
     if (expectedErrors === undefined) {
-      assertEquals(result, { success: true });
+      assert.deepStrictEqual(result, { success: true });
     } else {
-      assertFalse(result.success);
-      assertEquals(result.errors, expectedErrors);
+      assert.deepStrictEqual(result, { success: false, errors: expectedErrors });
     }
   });
 }

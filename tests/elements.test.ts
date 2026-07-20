@@ -1,5 +1,4 @@
-import type { Schema } from '@/types.ts';
-import { testCase } from './setup.ts';
+import { type Schema, testCase } from './setup.ts';
 
 const FLOAT32_SCHEMA: Schema = { elements: { type: 'float32' } };
 

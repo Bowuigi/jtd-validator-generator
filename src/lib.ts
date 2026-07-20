@@ -1,4 +1,4 @@
-import * as CG from '@/codegen.ts';
+import * as CG from './codegen.ts';
 import type { AST, PropertiesForm, Schema, SomeForm, TypeForm } from './types.ts';
 
 const interpolatedTypeOfData =
