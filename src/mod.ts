@@ -1,57 +1,5 @@
 import * as CG from '@/codegen.ts';
-
-type BaseForm = {
-  nullable?: boolean,
-  metadata?: Record<string, unknown>
-};
-
-type PropertiesForm =
-  & BaseForm
-  & { additionalProperties?: boolean }
-  & ({
-    properties: Record<string, SomeForm>,
-    optionalProperties?: Record<string, SomeForm>
-  } | {
-    properties?: Record<string, SomeForm>,
-    optionalProperties: Record<string, SomeForm>
-  });
-type DiscriminatorForm = BaseForm & {
-  discriminator: string,
-  mapping: Record<string, PropertiesForm>
-};
-type ElementsForm = BaseForm & { elements: SomeForm };
-type EmptyForm = BaseForm;
-type EnumForm = BaseForm & { enum: Array<string> };
-type RefForm = BaseForm & { ref: string };
-type TypeForm = BaseForm & {
-  type:
-    | 'boolean'
-    | 'float32'
-    | 'float64'
-    | 'int16'
-    | 'int32'
-    | 'int8'
-    | 'string'
-    | 'timestamp'
-    | 'uint16'
-    | 'uint32'
-    | 'uint8'
-};
-type ValuesForm = BaseForm & { values: SomeForm };
-
-type SomeForm =
-  | DiscriminatorForm
-  | ElementsForm
-  | EmptyForm
-  | EnumForm
-  | PropertiesForm
-  | RefForm
-  | TypeForm
-  | ValuesForm;
-
-export type Schema = {
-  definitions?: Record<string, SomeForm>
-} & SomeForm;
+import type { AST, PropertiesForm, Schema, SomeForm, TypeForm } from './types.ts';
 
 const interpolatedTypeOfData =
   '${data === null ? "null" : (Array.isArray(data) ? "array" : typeof data)}';
@@ -60,8 +8,8 @@ const interpolatedTypeOfKey = '${key === null ? "null" : typeof key}';
 function generateDiscriminator(
   discriminator: string,
   mapping: Record<string, PropertiesForm>
-): CG.AST {
-  const statements: Array<CG.AST> = [];
+): AST {
+  const statements: Array<AST> = [];
 
   statements.push(
     CG.ifElse(
@@ -101,8 +49,8 @@ function generateProperties(
   optionalProperties?: Record<string, SomeForm>,
   additionalProperties?: boolean,
   exemptDiscriminatorProperty?: string
-): CG.AST {
-  const statements: Array<CG.AST> = [];
+): AST {
+  const statements: Array<AST> = [];
 
   for (const [propName, propForm] of Object.entries(properties ?? {})) {
     statements.push(
@@ -163,7 +111,7 @@ function generateProperties(
   }
 }
 
-function generateValues(values: SomeForm): CG.AST {
+function generateValues(values: SomeForm): AST {
   return CG.ifElse(
     CG.dataIs('json_object'),
     CG.iterateOver(
@@ -178,7 +126,7 @@ function generateValues(values: SomeForm): CG.AST {
   );
 }
 
-function generateElements(elements: SomeForm): CG.AST {
+function generateElements(elements: SomeForm): AST {
   return CG.ifElse(
     CG.dataIs('array'),
     CG.iterateOver('data.entries()', onForm(elements)),
@@ -186,7 +134,7 @@ function generateElements(elements: SomeForm): CG.AST {
   );
 }
 
-function generateType(type: TypeForm['type']): CG.AST {
+function generateType(type: TypeForm['type']): AST {
   const ranges = {
     float32: { min: -3.40282347e+38, max: 3.4028234663852886e+38 },
     int8: { min: -128, max: 127 },
@@ -257,7 +205,7 @@ function generateType(type: TypeForm['type']): CG.AST {
   }
 }
 
-function generateEnum(options: Array<string>): CG.AST {
+function generateEnum(options: Array<string>): AST {
   return CG.formBlock(
     'enum',
     { enum_: CG.array(options) },
@@ -269,8 +217,8 @@ function generateEnum(options: Array<string>): CG.AST {
   );
 }
 
-function onForm(form: SomeForm): CG.AST {
-  const continuation: (rest: CG.AST) => CG.AST = form.nullable
+function onForm(form: SomeForm): AST {
+  const continuation: (rest: AST) => AST = form.nullable
     ? (rest) => CG.unless(CG.dataIs('null'), rest)
     : (rest) => rest;
 

@@ -1,22 +1,6 @@
-//// The AST itself
+import type { AST } from './types.ts';
 
-export type AST =
-  | string
-  | { is: 'validatorFunction', name: string, body: AST }
-  | { is: 'callValidatorFunction', name: string }
-  | { is: 'formBlock', form: string, bindings: Record<string, AST>, body: AST }
-  | { is: 'ifElse', cond: AST, ifTrue: AST, ifFalse: AST }
-  | { is: 'iterateOver', iterator: AST, body: AST }
-  | { is: 'overProperty', propertyName: string, body: AST }
-  | { is: 'when', cond: AST, ifTrue: AST }
-  | { is: 'unless', cond: AST, ifFalse: AST }
-  | { is: 'matchString', matcher: AST, patterns: Array<[string, AST]> }
-  | { is: 'seq', statements: Array<AST> }
-  | { is: 'dataIs', type: 'null' | 'boolean' | 'number' | 'string' | 'array' | 'json_object' }
-  | { is: 'pushError', msg: string, suggestions: AST }
-  | { is: 'array', items: Array<string> };
-
-//// Smart constructors
+//// Smart constructors for AST types
 
 export function validatorFunction(name: string, body: AST): AST {
   return { is: 'validatorFunction', name, body };
