@@ -53,11 +53,11 @@ function render(ast: AST): string {
 
   switch (ast.is) {
     case 'validatorFunction':
-      return `function validate${ast.name}(data: unknown, path: Path, errors: Errors): void {${
+      return `function validate${ast.name.replaceAll('-', '_')}(data: unknown, path: Path, errors: Errors): void {${
         render(ast.body)
       }}`;
     case 'callValidatorFunction':
-      return `validate${ast.name}(data, path, errors);`;
+      return `validate${ast.name.replaceAll('-', '_')}(data, path, errors);`;
     case 'formBlock': {
       const bindings = Object.entries(ast.bindings).map(([variable, value]) =>
         `const ${variable} = ${render(value)}`
