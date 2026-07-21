@@ -9,36 +9,29 @@ function generateDiscriminator(
   discriminator: string,
   mapping: Record<string, PropertiesForm>
 ): AST {
-  const statements: Array<AST> = [];
-
-  statements.push(
-    CG.ifElse(
-      `"${discriminator}" in data`,
-      CG.overProperty(discriminator, generateEnum(Object.keys(mapping))),
-      CG.pushError(`missing discriminator "${discriminator}"`, CG.array(Object.keys(mapping)))
-    )
-  );
-
-  statements.push(
-    CG.matchString(
-      `data.${discriminator}`,
-      Object.entries(mapping).map((
-        [key, props]
-      ) => [
-        key,
-        generateProperties(
-          props.properties,
-          props.optionalProperties,
-          props.additionalProperties,
-          discriminator
-        )
-      ])
-    )
-  );
-
   return CG.ifElse(
     CG.dataIs('json_object'),
-    CG.seq(statements),
+    CG.ifElse(
+      `"${discriminator}" in data`,
+      CG.seq([
+        CG.overProperty(discriminator, generateEnum(Object.keys(mapping))),
+        CG.matchString(
+          `data.${discriminator}`,
+          Object.entries(mapping).map((
+            [key, props]
+          ) => [
+            key,
+            generateProperties(
+              props.properties,
+              props.optionalProperties,
+              props.additionalProperties,
+              discriminator
+            )
+          ])
+        )
+      ]),
+      CG.pushError(`missing discriminator "${discriminator}"`, CG.array(Object.keys(mapping)))
+    ),
     CG.pushError(`expected JSON object, got ${interpolatedTypeOfData}`, CG.array([]))
   );
 }
